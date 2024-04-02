@@ -1,0 +1,29 @@
+[
+    {
+        "name": "update",
+        "params": {
+            "updating_json": "post_json"
+        },
+        "returns": {
+            "status": "code"
+        }
+    },
+    {
+        "name": "validate",
+        "params": {
+            "validating_json": "post_json"
+        },
+        "returns": {
+            "status": "code"
+        }
+    },
+    {
+        "name": "search",
+        "params": {
+            "search_clause": "search_json"
+        },
+        "returns": {
+            "status": "code"
+        }
+    }
+]
