@@ -1,6 +1,7 @@
 
-// 04/04/2024 
+// 04/04/2024
 
+#include <stdlib.h>
 #include "GPS_0404_s2024.h"
 
    // QUESTION 04/09/2024
@@ -11,6 +12,13 @@ int
 main(int argc, char *argv[])
 {
   int i;
+
+  for (i = 0; i < argc; i++)
+    {
+      double dd = atof(argv[i]);
+      printf("argv[%d] = %s %lf\n", i, argv[i], dd);
+    }
+
   GPS_DD ggg;
   
   // int i = 1;
@@ -47,6 +55,7 @@ main(int argc, char *argv[])
   distance_1 = gps_Home_Woodland.distance(gps_TLC_UCDavis);
   // distance_1 = (&gps_Home_Woodland)->distance(gps_TLC_UCDavis);
   printf("distance between Costco and TLC = %10.6lf miles\n", distance_1);
+  printf("{ \"distance\" : %lf }\n", distance_1);
 
   printf("%lf\n", gps_Home_Woodland.getLatitude());
   printf("%lf\n", gps_Home_Woodland.latitude);
