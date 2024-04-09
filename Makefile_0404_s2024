@@ -1,0 +1,29 @@
+# Makefile for ecs36b S2024
+#
+
+CC = g++ -std=c++14
+CFLAGS = -g -I/usr/include/jsoncpp
+
+# CFLAGS = -g -D_ECS35B_DEBUG_ -I/usr/include/jsoncpp
+# CFLAGS = -g -Wall -Wstrict-prototypes
+# CFLAGS = -O3
+
+# rules.
+all: 	test_0404_s2024
+
+#
+#
+
+GPS_0404_s2024.o:		GPS_0404_s2024.cpp GPS_0404_s2024.h
+	$(CC) -c $(CFLAGS) GPS_0404_s2024.cpp
+
+test_0404_s2024.o:		test_0404_s2024.cpp GPS_0404_s2024.h
+	$(CC) -c $(CFLAGS) test_0404_s2024.cpp
+
+test_0404_s2024:		GPS_0404_s2024.o test_0404_s2024.o
+	$(CC) -o test_0404_s2024 GPS_0404_s2024.o test_0404_s2024.o
+
+clean:
+	rm -f	*.o *~ core test_0404_s2024
+
+
