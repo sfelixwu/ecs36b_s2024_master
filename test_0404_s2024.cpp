@@ -1,6 +1,22 @@
 
 // 04/04/2024
 
+// HW1 hw1p2.cpp [04/11/2024]
+// main function
+
+// 1. checking if argc == 5
+
+// argv[] is an array of traditional C strings (char *)
+
+// 2. convert argv[1] and argv[2] to two doubles using atof() lt1 and lg1
+// 3. using lt1 and lg1 to create the GPS_DD object 1.
+
+// 4. repeat steps 2 and 3 for argv[3] and argv[4], and
+//    using lt2 and lg2 to create GPS_DD object 2.
+
+// 5. double distance = GPS_obj1.distance(GPS_obj2);
+// 6. print the distance in JSON format
+
 #include <stdlib.h>
 #include "GPS_0404_s2024.h"
 
@@ -55,6 +71,15 @@ main(int argc, char *argv[])
   distance_1 = gps_Home_Woodland.distance(gps_TLC_UCDavis);
   // distance_1 = (&gps_Home_Woodland)->distance(gps_TLC_UCDavis);
   printf("distance between Costco and TLC = %10.6lf miles\n", distance_1);
+
+  distance_1 = gps_Home_Woodland - ((GPS_DD) gps_TLC_UCDavis);
+  // distance_1 = gps_Home_Woodland."-"(gps_TLC_UCDavis);
+  printf("distance between Costco and TLC = %10.6lf miles\n", distance_1);
+
+  // distance_1 = ((GPS_DD&) gps_Home_Woodland) - ((GPS_DD&) gps_TLC_UCDavis);
+  // distance_1 = gps_Home_Woodland."-"(gps_TLC_UCDavis);
+  printf("distance between Costco and TLC = %10.6lf miles\n", distance_1);
+
   printf("{ \"distance\" : %lf }\n", distance_1);
 
   printf("%lf\n", gps_Home_Woodland.getLatitude());
@@ -69,7 +94,7 @@ main(int argc, char *argv[])
 
   // line 3
   // operator overloading
-  distance_1 = gps_Home_Woodland - gps_TLC_UCDavis;
+  // distance_1 = gps_Home_Woodland - gps_TLC_UCDavis;
   // distance_1 = gps_Home_Woodland.operator-(gps_TLC_UCDavis);
   
   printf("distance 1 = %lf miles (operator overloading)\n", distance_1);
@@ -83,8 +108,8 @@ main(int argc, char *argv[])
   GPS_DD gps_NYC {40.7, -73.95};
   GPS_DD gps_Sydney {-33.87, 151.213};
 
-  printf("distance from NYC to Davis is %lf miles\n", gps_NYC - gps_TLC_UCDavis);
-  printf("distance from Sydney to NYC is %lf miles\n", gps_NYC - gps_Sydney);
+  // printf("distance from NYC to Davis is %lf miles\n", gps_NYC - gps_TLC_UCDavis);
+  // printf("distance from Sydney to NYC is %lf miles\n", gps_NYC - gps_Sydney);
   
   return 0;
 }
