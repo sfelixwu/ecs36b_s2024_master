@@ -6,6 +6,7 @@
 
 #include <unistd.h>
 #include <strings.h>
+#include <string.h>
 #include <string>
 #include <iostream>
 #include <stdio.h>

@@ -63,8 +63,13 @@ Person::getName()
 bool
 Person::operator==
 (Person& aPerson)
+// (Person aPerson)
+// (Person * aPerson)
 {
   return (this->vsID == aPerson.getvsID());
+
+  // return ((this->vsID == aPerson.getvsID()) &&
+  // 	     (this->name == aPerson.getName());
 }
 
 Json::Value *

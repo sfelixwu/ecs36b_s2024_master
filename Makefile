@@ -25,7 +25,7 @@ CORE_OBJS =	Core.o Person.o Post.o Comment.o Reaction.o		\
 		ecs36b_Exception.o
 
 # rules.
-all: 	ecs36bserver ecs36bupdate ecs36bsearch
+all: 	ecs36bserver ecs36bupdate ecs36bsearch ecs36b_hw2_ref
 
 #
 #
@@ -35,6 +35,9 @@ ecs36bclient.h:		ecs36b_s2024.json
 
 ecs36bserver.h:		ecs36b_s2024.json
 	jsonrpcstub ecs36b_s2024.json --cpp-server=ecs36bServer --cpp-client=ecs36bClient
+
+ecs36b_hw2_ref.o:	ecs36b_hw2_ref.cpp $(CORE_INCS)
+	$(CC) -c $(CFLAGS) ecs36b_hw2_ref.cpp
 
 ecs36bupdate.o:		ecs36bupdate.cpp ecs36bclient.h ecs36bserver.h $(CORE_INCS)
 	$(CC) -c $(CFLAGS) ecs36bupdate.cpp
@@ -110,6 +113,9 @@ Link.o:			Link.cpp Link.h $(CORE_INCS)
 
 Action.o:		Action.cpp Action.h $(CORE_INCS)
 	$(CC) -c $(CFLAGS) Action.cpp
+
+ecs36b_hw2_ref:		$(CORE_OBJS) ecs36b_hw2_ref.o
+	$(CC) -o ecs36b_hw2_ref $(CORE_OBJS) ecs36b_hw2_ref.o $(LDFLAGS)
 
 ecs36bupdate:		$(CORE_OBJS) ecs36bupdate.o
 	$(CC) -o ecs36bupdate $(CORE_OBJS) ecs36bupdate.o $(LDFLAGS)
