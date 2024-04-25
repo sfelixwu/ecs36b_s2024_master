@@ -2,8 +2,19 @@
 #include "JvTime.h"
 #include "GPS.h"
 
+// high-level design of hw2 part 2
+// 1. check whether we indeed have three arguments
+// 2. File(s) ==> JSONs (JSON::Value) [ecs36b_JSON.cpp -- myFile2JSON() -- check whether it is a valid JSON from syntax]
+// 3. Check whether the JSON is valid for HW#2
+//    array, each element 2 key-value pairs, GPS_DD and Time, GPS_DD -> latitude and longitude
+
+// JSON and C++/Java
+// JSON is an intermediate representation language for objects
+
+
 using namespace std;
 
+// 4. establish some record to put the GPS info together with the timestamp
 struct hw2_item
 {
   GPS_DD gps;
@@ -13,6 +24,7 @@ struct hw2_item
 int
 main(int argc, char *argv[])
 {
+  // step 1
   if (argc != 3)
     {
       char arg_string[] = " <location_json> <question_json>";
@@ -22,7 +34,7 @@ main(int argc, char *argv[])
 
   int rc;
 
-  // process the input
+  // step 2: process the input
   Json::Value location_jv;
   rc = myFile2JSON(argv[1], &location_jv);
   std::cout << location_jv << std::endl;
@@ -41,7 +53,7 @@ main(int argc, char *argv[])
       return -1;
     }
 
-  // process the array
+  // step 3: process the array
   int i;
   struct hw2_item * hw2_item_array = (struct hw2_item *) NULL;
   Json::Value *jv_ptr = (Json::Value *) NULL;
@@ -97,7 +109,9 @@ main(int argc, char *argv[])
       return -1;
     }
 
-  // handle the question
+  // 5. handle the question
+  // 5.1. correct question
+  
   std::string jvt_s;
   
   if (((question_jv["Time"]).isNull() != true)    &&
@@ -110,21 +124,25 @@ main(int argc, char *argv[])
       std::cout << "question JSON content error" << std::endl;
       return -1;
     }
+
+  // 5.2. create a JvTime object for comparison
   JvTime jvt_question { jvt_s.c_str() };
 
   // now check the timestamps
   std::cout << "hw2_item_array:\n";
+
+  // 5.3. compare every element in the array, until we found the correct element and its GPS location
   
   for (i = 0; i < location_jv.size(); i++)
     {
       std::cout << "array index = " << i << std::endl;
       
       jv_ptr = ((hw2_item_array[i]).gps).dump2JSON();
-      std::cout << *jv_ptr << std::endl;
+      // std::cout << *jv_ptr << std::endl;
       delete jv_ptr;
       
       jv_ptr = ((hw2_item_array[i]).jvt).dump2JSON();
-      std::cout << *jv_ptr << std::endl;
+      // std::cout << *jv_ptr << std::endl;
       delete jv_ptr;
 
       double time_diff = jvt_question - ((hw2_item_array[i]).jvt);
