@@ -191,6 +191,7 @@ const char *ecs36berror[] =
     "JSONRPC Client",
     "Strlen >= 1023",
     "ID being set Twice",
+    "JSON2Object class Timed_Location",
     "Invalid Error Code (ECS36B_ERROR_MAX)",
   };
 

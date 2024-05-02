@@ -16,16 +16,16 @@ CORE_INCS =	Core.h Person.h Post.h Comment.h Reaction.h		\
 		Action.h Link.h JvTime.h Tag.h Thing.h			\
 		Record.h GPS.h Labeled_GPS.h Commutable.h Team.h	\
 		Holdable.h Locatable.h Message.h OKey.h			\
-		ecs36b_Common.h ecs36b_Exception.h
+		Timed_Location.h ecs36b_Common.h ecs36b_Exception.h
 
 CORE_OBJS =	Core.o Person.o Post.o Comment.o Reaction.o		\
 	 	Action.o Link.o JvTime.o Tag.o Thing.o OKey.o		\
 		Record.o GPS.o Labeled_GPS.o Commutable.o Team.o	\
 		Holdable.o Locatable.o ecs36b_JSON.o Message.o		\
-		ecs36b_Exception.o
+		Timed_Location.o ecs36b_Exception.o
 
 # rules.
-all: 	ecs36bserver ecs36bupdate ecs36bsearch ecs36b_hw2_ref
+all: 	ecs36bserver ecs36bupdate ecs36bsearch ecs36b_hw2_ref ecs36b_hw3_ref_01
 
 #
 #
@@ -38,6 +38,9 @@ ecs36bserver.h:		ecs36b_s2024.json
 
 ecs36b_hw2_ref.o:	ecs36b_hw2_ref.cpp $(CORE_INCS)
 	$(CC) -c $(CFLAGS) ecs36b_hw2_ref.cpp
+
+ecs36b_hw3_ref_01.o:	ecs36b_hw3_ref_01.cpp $(CORE_INCS)
+	$(CC) -c $(CFLAGS) ecs36b_hw3_ref_01.cpp
 
 ecs36bupdate.o:		ecs36bupdate.cpp ecs36bclient.h ecs36bserver.h $(CORE_INCS)
 	$(CC) -c $(CFLAGS) ecs36bupdate.cpp
@@ -68,6 +71,9 @@ Commutable.o:		Commutable.cpp Commutable.h $(CORE_INCS)
 
 Transaction.o:		Transaction.cpp Transaction.h $(CORE_INCS)
 	$(CC) -c $(CFLAGS) Transaction.cpp
+
+Timed_Location.o:	Timed_Location.cpp Timed_Location.h $(CORE_INCS)
+	$(CC) -c $(CFLAGS) Timed_Location.cpp
 
 Record.o:		Record.cpp Record.h $(CORE_INCS)
 	$(CC) -c $(CFLAGS) Record.cpp
@@ -116,6 +122,9 @@ Action.o:		Action.cpp Action.h $(CORE_INCS)
 
 ecs36b_hw2_ref:		$(CORE_OBJS) ecs36b_hw2_ref.o
 	$(CC) -o ecs36b_hw2_ref $(CORE_OBJS) ecs36b_hw2_ref.o $(LDFLAGS)
+
+ecs36b_hw3_ref_01:		$(CORE_OBJS) ecs36b_hw3_ref_01.o
+	$(CC) -o ecs36b_hw3_ref_01 $(CORE_OBJS) ecs36b_hw3_ref_01.o $(LDFLAGS)
 
 ecs36bupdate:		$(CORE_OBJS) ecs36bupdate.o
 	$(CC) -o ecs36bupdate $(CORE_OBJS) ecs36bupdate.o $(LDFLAGS)
