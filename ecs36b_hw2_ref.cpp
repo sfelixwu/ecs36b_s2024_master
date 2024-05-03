@@ -61,8 +61,10 @@ main(int argc, char *argv[])
   if (location_jv.isArray() == true)
     {
       // allocate memory for hw2_item array
+      // hw2_item_array = (struct hw2_item *)
+      // malloc(sizeof(struct hw2_item) * location_jv.size());
       hw2_item_array = (struct hw2_item *)
-	malloc(sizeof(struct hw2_item) * location_jv.size());
+	new struct hw2_item[location_jv.size()];
       
       for (i = 0; i < location_jv.size(); i++)
 	{
@@ -133,6 +135,7 @@ main(int argc, char *argv[])
 
   // 5.3. compare every element in the array, until we found the correct element and its GPS location
   
+  // unsigned int last_positive_index = 0;
   for (i = 0; i < location_jv.size(); i++)
     {
       std::cout << "array index = " << i << std::endl;
@@ -145,10 +148,22 @@ main(int argc, char *argv[])
       // std::cout << *jv_ptr << std::endl;
       delete jv_ptr;
 
+      // t1 and t2
+      // t1 a later/newer timestamp than t2
+      // timediff = t1 - t2;
+      // if t1 is newer, then the "value" of the time should have been greater
+      // if t2 is older, then the "value" of the time should have been smaller
+      // (t1 - t2) is going to be a positive value
+      // otherwise, it will be a negative value (in seconds).
+
       double time_diff = jvt_question - ((hw2_item_array[i]).jvt);
       std::cout << "the difference is " << time_diff << std::endl;
-      
       std::cout << std::endl;
+
+      // if (time_diff is negative)
+      //    print hw2_item_array[last_positive_index].gps.dump2JSON()
+      // else
+      //    last_positive_index = i;
     }
 
   return 0;
