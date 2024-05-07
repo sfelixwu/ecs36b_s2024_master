@@ -25,10 +25,17 @@ CORE_OBJS =	Core.o Person.o Post.o Comment.o Reaction.o		\
 		Timed_Location.o ecs36b_Exception.o
 
 # rules.
-all: 	ecs36bserver ecs36bupdate ecs36bsearch ecs36b_hw2_ref ecs36b_hw3_ref_01
+all: 	ecs36bserver ecs36bupdate ecs36bsearch ecs36b_hw2_ref		\
+	ecs36b_hw3_ref_01 hw3ref2client hw3ref2server
 
 #
 #
+
+hw3ref2client.h:	ecs36b_s2024_hw3ref2.json
+	jsonrpcstub ecs36b_s2024_hw3ref2.json --cpp-server=hw3ref2Server --cpp-client=hw3ref2Client
+
+hw3ref2server.h:		ecs36b_s2024_hw3ref2.json
+	jsonrpcstub ecs36b_s2024_hw3ref2.json --cpp-server=hw3ref2Server --cpp-client=hw3ref2Client
 
 ecs36bclient.h:		ecs36b_s2024.json
 	jsonrpcstub ecs36b_s2024.json --cpp-server=ecs36bServer --cpp-client=ecs36bClient
@@ -41,6 +48,12 @@ ecs36b_hw2_ref.o:	ecs36b_hw2_ref.cpp $(CORE_INCS)
 
 ecs36b_hw3_ref_01.o:	ecs36b_hw3_ref_01.cpp $(CORE_INCS)
 	$(CC) -c $(CFLAGS) ecs36b_hw3_ref_01.cpp
+
+hw3ref2client.o:	hw3ref2client.cpp hw3ref2client.h $(CORE_INCS)
+	$(CC) -c $(CFLAGS) hw3ref2client.cpp
+
+hw3ref2server.o:	hw3ref2server.cpp hw3ref2server.h $(CORE_INCS)
+	$(CC) -c $(CFLAGS) hw3ref2server.cpp
 
 ecs36bupdate.o:		ecs36bupdate.cpp ecs36bclient.h ecs36bserver.h $(CORE_INCS)
 	$(CC) -c $(CFLAGS) ecs36bupdate.cpp
@@ -125,6 +138,12 @@ ecs36b_hw2_ref:		$(CORE_OBJS) ecs36b_hw2_ref.o
 
 ecs36b_hw3_ref_01:		$(CORE_OBJS) ecs36b_hw3_ref_01.o
 	$(CC) -o ecs36b_hw3_ref_01 $(CORE_OBJS) ecs36b_hw3_ref_01.o $(LDFLAGS)
+
+hw3ref2client:		$(CORE_OBJS) hw3ref2client.o
+	$(CC) -o hw3ref2client $(CORE_OBJS) hw3ref2client.o $(LDFLAGS)
+
+hw3ref2server:		$(CORE_OBJS) hw3ref2server.o
+	$(CC) -o hw3ref2server $(CORE_OBJS) hw3ref2server.o $(LDFLAGS)
 
 ecs36bupdate:		$(CORE_OBJS) ecs36bupdate.o
 	$(CC) -o ecs36bupdate $(CORE_OBJS) ecs36bupdate.o $(LDFLAGS)

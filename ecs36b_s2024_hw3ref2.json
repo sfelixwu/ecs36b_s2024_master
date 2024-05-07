@@ -1,0 +1,21 @@
+[
+    {
+        "name": "upload",
+        "params": {
+            "updating_json": {}
+        },
+        "returns": {
+            "status": "code"
+        }
+    },
+    {
+        "name": "question",
+        "params": {
+            "search_clause": {}
+        },
+        "returns": {
+            "status": "code",
+	    "result": {}
+        }
+    }
+]
