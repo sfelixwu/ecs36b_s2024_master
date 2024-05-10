@@ -62,8 +62,8 @@ Person::getName()
 // function prototype
 bool
 Person::operator==
-(Person& aPerson)
-// (Person aPerson)
+(Person aPerson)
+// (Person& aPerson)
 // (Person * aPerson)
 {
   return (this->vsID == aPerson.getvsID());

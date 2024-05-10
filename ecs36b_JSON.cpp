@@ -577,7 +577,7 @@ Identifier::setPPC
 
 bool
 Identifier::operator==
-(Identifier& aIdentifier)
+(Identifier aIdentifier)
 {
   return ((this->profile == aIdentifier.profile) &&
 	  (this->post    == aIdentifier.post)    &&

@@ -18,10 +18,11 @@ class GPS_DD : public Core
 
   GPS_DD();
   GPS_DD(double, double);
-  double getLatitude();
-  double getLongitude();
+  const double getLatitude();
+  const double getLongitude();
   double distance(GPS_DD);
-  bool operator==(GPS_DD& another);
+  bool operator==(GPS_DD another);
+  bool operator<(GPS_DD another);
   
   virtual Json::Value * dump2JSON(void);
   virtual void JSON2Object(Json::Value *);

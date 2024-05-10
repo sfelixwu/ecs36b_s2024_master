@@ -28,6 +28,7 @@ myhw3ref2Server::myhw3ref2Server(AbstractServerConnector &connector, serverVersi
 }
 
 std::vector<Timed_Location> hw3_TL_vector;
+std::map<std::string, std::vector<Timed_Location>> hw3_TLID_map;
 
 Json::Value
 myhw3ref2Server::upload
@@ -36,7 +37,6 @@ myhw3ref2Server::upload
   Json::Value result;
   
   std::cout << "upload" << " " << location_jv << std::endl;
-  std::string strJson;
 
   time_t ticks; 
   ticks = time(NULL);
@@ -49,12 +49,24 @@ myhw3ref2Server::upload
 
   int i;
   Json::Value *jv_ptr = (Json::Value *) NULL;
+  std::string id_str;
 
   if ((location_jv["identity"].isNull() != true) &&
       (location_jv["identity"].isString() == true) &&
       (location_jv["traces"].isNull() != true) &&
       (location_jv["traces"].isArray() == true))
     {
+      id_str = location_jv["identity"].asString();
+      
+      if (hw3_TLID_map.find(id_str) != hw3_TLID_map.end())
+	{
+	  for (i = 0; i < ((hw3_TLID_map.find(id_str))->second).size();
+	       i++)
+	    {
+	      (hw3_TL_vector).push_back(((hw3_TLID_map.find(id_str))->second)[i]);
+	    }
+	}
+
       for (i = 0; i < location_jv["traces"].size(); i++)
 	{
 	  // let us check if the JSON has the right content
@@ -87,15 +99,36 @@ myhw3ref2Server::upload
 	  else
 	    {
 	      std::cout << "JSON content error" << std::endl;
-	      return -1;
+	      result["status"] = "failed";
+	      return result;
 	    }
 	}
     }
   else
     {
       std::cout << "JSON content error" << std::endl;
-      return -1;
+      result["status"] = "failed";
+      return result;
     }
+
+  TL_Sort(hw3_TL_vector);
+  std::vector<Timed_Location> * unique_ptr = NULL;
+  unique_ptr = TL_Unique(hw3_TL_vector);
+  hw3_TLID_map[id_str] = (*unique_ptr);
+  delete unique_ptr;
+  
+  // dump the MAP
+  for (const auto& n : hw3_TLID_map)
+    {
+      std::cout << '[' << n.first << ']' << std::endl;
+      for (i = 0; i < (n.second).size(); i++)
+	{
+	  Timed_Location x = (n.second)[i];
+	  Json::Value *jvp = x.dump2JSON();
+	  std::cout << (*jvp) << std::endl;
+	}
+    }
+  std::cout << std::endl;
 
   result["status"] = "successful";
   return result;
@@ -123,7 +156,8 @@ myhw3ref2Server::question
   Json::Value *jv_ptr = (Json::Value *) NULL;
 
   std::string jvt_s;
-  
+  std::string id_str;
+
   if (((question_jv["time"]).isNull() != true)    &&
       ((question_jv["time"]).isObject() == true)  &&
       ((question_jv["identity"]).isNull() != true)    &&
@@ -136,37 +170,57 @@ myhw3ref2Server::question
   else
     {
       std::cout << "question JSON content error" << std::endl;
-      return -1;
+      result["status"] = "failed";
+      return result;
     }
 
   JvTime jvt_question { jvt_s.c_str() };
 
   std::cout << "hw3_TL_vector:\n";
-
-  for (i = 0; i < hw3_TL_vector.size(); i++)
-    {
-      std::cout << "array index = " << i << std::endl;
-      
-      jv_ptr = (hw3_TL_vector[i]).dump2JSON();
-      std::cout << *jv_ptr << std::endl;
-      delete jv_ptr;
-
-      // t1 and t2
-      // t1 a later/newer timestamp than t2
-      // timediff = t1 - t2;
-      // if t1 is newer, then the "value" of the time should have been greater
-      // if t2 is older, then the "value" of the time should have been smaller
-      // (t1 - t2) is going to be a positive value
-      // otherwise, it will be a negative value (in seconds).
-      
-      double time_diff = jvt_question - ((hw3_TL_vector[i]).time);
-      std::cout << "the difference is " << time_diff << std::endl;
-      std::cout << std::endl;
-    }
   
+  id_str = question_jv["identity"].asString();
+  if (hw3_TLID_map.find(id_str) != hw3_TLID_map.end())
+    {
+      hw3_TL_vector = (hw3_TLID_map.find(id_str))->second;
+      for (i = 0; i < hw3_TL_vector.size(); i++)
+	{
+	  std::cout << "array index = " << i << std::endl;
+	  jv_ptr = (hw3_TL_vector[i]).dump2JSON();
+	  std::cout << *jv_ptr << std::endl;
+	  delete jv_ptr;
+
+	  // t1 and t2
+	  // t1 a later/newer timestamp than t2
+	  // timediff = t1 - t2;
+	  // if t1 is newer, then the "value" of the time should have been greater
+	  // if t2 is older, then the "value" of the time should have been smaller
+	  // (t1 - t2) is going to be a positive value
+	  // otherwise, it will be a negative value (in seconds).
+      
+	  double time_diff = jvt_question - ((hw3_TL_vector[i]).time);
+	  std::cout << "the difference is " << time_diff << std::endl;
+	  std::cout << std::endl;
+	}
+    }
+  else
+    {
+      std::cout << "question JSON content error" << std::endl;
+      result["status"] = "failed";
+      return result;
+    }
+
   result["status"] = "successful";
   return result;
 }
+
+// 1. ecs36b_s2024_hw3ref2.json ==> two RPC functions
+// 2. follow the template of RPC (e.g., hw3client.h and hw3server.h, both generated)
+//    ==> inheriting from those classes and to have the two functions in *.cpp
+//    ==> upload() and question()
+// 3. "copy and paste": from the original program, ecs36b_hw3_ref_01.cpp, section by section
+//    ==> into those two functions
+// 4. taking care of the information sharing between those two functions
+//    options ==> (1) global variables (2) files (persistence)
 
 int
 main(int argc, char *argv[])

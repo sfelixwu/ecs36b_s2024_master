@@ -28,7 +28,7 @@ Labeled_GPS::setGPSLabel
 
 bool
 Labeled_GPS::operator==
-(Labeled_GPS& another)
+(Labeled_GPS another)
 {
   return((this->latitude == another.getLatitude()) &&
 	 (this->longitude == another.getLongitude()) &&

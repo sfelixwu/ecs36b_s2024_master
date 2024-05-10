@@ -27,7 +27,7 @@ class Comment : public Core
   Comment(std::string arg_profile_id, std::string arg_post_id, std::string arg_comment_id,
 	  Person * arg_author, Message * arg_msg, JvTime * arg_created);
   ~Comment();
-  bool operator==(Comment& aComment);
+  bool operator==(Comment aComment);
   virtual Json::Value * dump2JSON(void);
   virtual void JSON2Object(Json::Value *);
 };

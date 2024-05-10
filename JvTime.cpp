@@ -135,7 +135,7 @@ JvTime::getTimeString
 
 bool
 JvTime::operator==
-(JvTime& arg_jvt)
+(JvTime arg_jvt)
 {
   return ((this->year == arg_jvt.year) && 
 	  (this->month == arg_jvt.month) && 
@@ -145,9 +145,78 @@ JvTime::operator==
 	  (this->second == arg_jvt.second));
 }
 
+bool
+JvTime::operator<
+(JvTime arg_jvt)
+{
+  if (this->year <= arg_jvt.year)
+    {
+      if (this->year < arg_jvt.year)
+	{
+	  return true;
+	}
+      else
+	{
+	  if(this->month <= arg_jvt.month)
+	    {
+	      if (this->month < arg_jvt.month)
+		{
+		  return true;
+		}
+	      else
+		{
+		  if (this->day <= arg_jvt.day)
+		    {
+		      if (this->day < arg_jvt.day)
+			{
+			  return true;
+			}
+		      else
+			{
+			  if (this->hour <= arg_jvt.hour)
+			    {
+			      if (this->hour < arg_jvt.hour)
+				{
+				  return true;
+				}
+			      else
+				{
+				  if (this->minute <= arg_jvt.minute)
+				    {
+				      if (this->minute < arg_jvt.minute)
+					{
+					  return true;
+					}
+				      else
+					{
+					  if (this->second <= arg_jvt.second)
+					    {
+					      if (this->second < arg_jvt.second)
+						{
+						  return true;
+						}
+					      else
+						{
+						  return false;
+						}
+					    }
+					}
+				    }
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	}
+    }
+
+  return false;
+}
+
 double
 JvTime::operator-
-(JvTime& arg_jvt)
+(JvTime arg_jvt)
 {
   // arg_jvt should be older timestamp
   

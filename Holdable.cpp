@@ -19,11 +19,11 @@ Holdable::~Holdable
 
 bool
 Holdable::operator==
-(const Holdable& another)
+(Holdable another)
 {
   std::cout << "Holdable::operator == was called\n";
   return ((*(this->holder) == *(another.holder)) &&
-	  (((Locatable&) (*this)) == ((Locatable&) another)));
+	  (((Locatable) (*this)) == ((Locatable) another)));
 }
 
 Json::Value *

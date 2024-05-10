@@ -19,7 +19,8 @@ class Locatable : public Thing
   
   Locatable(void);
   ~Locatable(void);
-  bool operator==(const Locatable&);
+
+  bool operator==(Locatable);
   virtual Json::Value * dump2JSON(void);
   virtual void JSON2Object(Json::Value *);
 };

@@ -29,7 +29,7 @@ Reaction::Reaction
 
 bool
 Reaction::operator==
-(Reaction& aReaction)
+(Reaction aReaction)
 {
   bool brc = true;
 

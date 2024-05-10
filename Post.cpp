@@ -139,6 +139,13 @@ Post::~Post
     }
 }
 
+bool
+Post::operator==
+(Post aPost)
+{
+  return (this->id == aPost.id);
+}
+
 Json::Value *
 Post::dump2JSON
 (void)

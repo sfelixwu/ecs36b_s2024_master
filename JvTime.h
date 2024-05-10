@@ -27,8 +27,11 @@ class JvTime
   struct std::tm * getStdTM(void);
   int setStdTM(struct std::tm *);
   std::string * getTimeString(void);
-  virtual bool operator==(JvTime& arg_jvt);
-  virtual double operator-(JvTime& arg_jvt);
+
+  bool operator==(JvTime arg_jvt);
+  bool operator<(JvTime arg_jvt);
+  double operator-(JvTime arg_jvt);
+  
   virtual Json::Value * dump2JSON(void);
   virtual void JSON2Object(Json::Value *);
 };

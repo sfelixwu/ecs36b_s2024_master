@@ -70,7 +70,7 @@ Comment::~Comment
 
 bool
 Comment::operator==
-(Comment& aComment)
+(Comment aComment)
 {
   // operator== of Identifier
   return (this->id == aComment.id);

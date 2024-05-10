@@ -17,13 +17,13 @@ GPS_DD::GPS_DD(double arg_latitude, double arg_longitude)
   this->longitude = arg_longitude;
 }
 
-double 
+const double 
 GPS_DD::getLatitude()
 {
   return this->latitude;
 }
  
-double
+const double
 GPS_DD::getLongitude
 ()
 {
@@ -123,10 +123,23 @@ GPS_DD::distance
 
 bool
 GPS_DD::operator==
-(GPS_DD& another)
+(GPS_DD another)
 {
   return((this->latitude == another.getLatitude()) &&
 	 (this->longitude == another.getLongitude()));
+}
+
+bool
+GPS_DD::operator<
+(GPS_DD another)
+{
+  if (this->latitude < another.getLatitude()) return true;
+
+  if ((this->latitude == another.getLatitude()) &&
+      (this->longitude < another.getLongitude()))
+      return true;
+
+  return false;
 }
 
 Json::Value *

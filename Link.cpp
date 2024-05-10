@@ -17,7 +17,7 @@ Link::Link
 
 bool
 Link::operator==
-(Link& aLink)
+(Link aLink)
 {
   return (this->url == aLink.url);
 }

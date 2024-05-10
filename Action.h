@@ -13,7 +13,7 @@ class Action : public Core
   Action();
   Action(std::string, std::string, std::string, std::string);
 
-  bool operator==(Action& aAction);
+  bool operator==(Action aAction);
   virtual Json::Value * dump2JSON(void);
   virtual void JSON2Object(Json::Value *);
 };

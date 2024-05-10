@@ -26,12 +26,12 @@ public:
   ~Person();
   
   void setHome(GPS_DD *);
-
   std::string getvsID();
   std::string getName();
   GPS_DD * getHome();
 
-  bool operator==(Person& aPerson);
+  bool operator==(Person aPerson);
+
   virtual Json::Value * dump2JSON(void);
   virtual void JSON2Object(Json::Value *);
 };

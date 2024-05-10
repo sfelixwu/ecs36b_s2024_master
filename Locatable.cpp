@@ -19,7 +19,7 @@ Locatable::~Locatable
 
 bool
 Locatable::operator==
-(const Locatable& another)
+(Locatable another)
 {
   // std::cout << "Locatable::operator == was called\n";
   if ((this->location == NULL) ||
@@ -29,7 +29,7 @@ Locatable::operator==
     }
   
   return ((*(this->location) == *(another.location)) &&
-	  (((Thing&) (*this)) == ((Thing&) another)));
+	  (((Thing) (*this)) == ((Thing) another)));
 }
 
 Json::Value *

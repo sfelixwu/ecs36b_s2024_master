@@ -60,8 +60,9 @@ Record::setWhen(JvTime *_jt)
 
 bool
 Record::operator==
-(Record& aRecord)
+(Record aRecord)
 {
+  // to be implemented
   return false;
 }
 

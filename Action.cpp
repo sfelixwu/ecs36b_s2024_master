@@ -18,7 +18,7 @@ Action::Action(std::string core_arg_host_url,
 
 bool
 Action::operator==
-(Action& aAction)
+(Action aAction)
 {
   return ((this->name) == aAction.name);
 }

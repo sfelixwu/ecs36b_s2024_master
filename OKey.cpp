@@ -3,7 +3,7 @@
 
 bool
 OKey::operator==
-(OKey& aOKey)
+(OKey aOKey)
 {
   return (this->okey == aOKey.okey);
 }

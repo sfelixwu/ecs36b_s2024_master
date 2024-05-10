@@ -1,0 +1,11 @@
+[
+    {
+        "name": "upload",
+        "params": {
+            "updating_json": {}
+        },
+        "returns": {
+            "status": "code"
+        }
+    }
+]

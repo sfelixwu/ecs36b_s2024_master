@@ -13,7 +13,7 @@ Thing::Thing
 
 bool
 Thing::operator==
-(const Thing& another)
+(Thing another)
 {
   // std::cout << "Thing::operator == was called\n";
   return ((this->sequence_num == another.sequence_num) &&
