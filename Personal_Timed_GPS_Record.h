@@ -30,6 +30,10 @@ class Personal_Timed_GPS_Record : public Core
 
   virtual bool upload(Json::Value);
   virtual GPS_DD question(JvTime);
+
+  // remote ==> on a different space
+  // pointer ==> some address on the same memory space
+  
   virtual Personal_Timed_GPS_Record * operator->();
   
   virtual Json::Value * dump2JSON(void);

@@ -125,17 +125,24 @@ main(int argc, char *argv[])
     cerr << e.what() << endl;
   }
 
-  // now local object
+  Personal_Timed_GPS_Record *x_ptr;
+  
+  // now local object (Real object here)
   Personal_Timed_GPS_Record my_local_ptgr;
-  my_local_ptgr.upload(location_jv);
+  my_local_ptgr.identity = location_jv["identity"].asString();
+  x_ptr = &my_local_ptgr;
+  // my_local_ptgr.upload(location_jv);
+  x_ptr->upload(location_jv);
   GPS_DD my_local_answer = my_local_ptgr.question(jvt_question);
   std::cout << *(my_local_answer.dump2JSON()) << std::endl;
 
-  // now remote object
+  // now proxy object (Real object at URL)
   Shadow_Record shadow_object_1001;
   shadow_object_1001.host_url = "http://localhost:8300";
   shadow_object_1001.identity = location_jv["identity"].asString();
-  shadow_object_1001.upload(location_jv);
+  x_ptr = &shadow_object_1001;
+  // shadow_object_1001.upload(location_jv);
+  x_ptr->upload(location_jv);
   GPS_DD my_remote_answer = shadow_object_1001.question(jvt_question);
   std::cout << *(my_remote_answer.dump2JSON()) << std::endl;
 

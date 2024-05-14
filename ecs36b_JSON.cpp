@@ -192,6 +192,7 @@ const char *ecs36berror[] =
     "Strlen >= 1023",
     "ID being set Twice",
     "JSON2Object class Timed_Location",
+    "JSON2Object class Personal_Timed_GPS_Record",
     "Invalid Error Code (ECS36B_ERROR_MAX)",
   };
 

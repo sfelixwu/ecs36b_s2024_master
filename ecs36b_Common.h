@@ -133,7 +133,8 @@ public:
 #define ECS36B_ERROR_STRLEN_GE_1023               -48
 #define ECS36B_ERROR_ID_SET_TWICE                 -49
 #define ECS36B_ERROR_JSON2OBJECT_TIMED_LOCATION   -50
-#define ECS36B_ERROR_MAX                          -51
+#define ECS36B_ERROR_JSON2OBJECT_PERSONAL_TIMED_GPS_RECORD   -51
+#define ECS36B_ERROR_MAX                          -52
 
 extern const vector<std::string> keys_Thing;
 extern const vector<std::string> keys_Locatable;

@@ -28,6 +28,10 @@ myhw3ref3Server::myhw3ref3Server(AbstractServerConnector &connector, serverVersi
   std::cout << "myhw3ref3Server Object created" << std::endl;
 }
 
+// std::map
+// two columns: first, second
+// first  --> a string
+// second --> an PTGR object
 std::map<std::string, Personal_Timed_GPS_Record> hw3_PTGR_map;
 
 Json::Value
@@ -35,7 +39,8 @@ myhw3ref3Server::upload
 (const Json::Value& location_jv)
 {
   Json::Value result;
-  
+
+  // the following part is just for logging of information for the server
   std::cout << "upload" << " " << location_jv << std::endl;
 
   time_t ticks; 
@@ -47,6 +52,8 @@ myhw3ref3Server::upload
   std::strftime(buffer, 32, "%Y-%m-%dT%H:%M:%S", my_tm_ptr);
   printf("at %s\n", buffer);
 
+  // above is for logginhg
+  
   int i;
   Json::Value *jv_ptr = (Json::Value *) NULL;
   std::string id_str;
@@ -59,9 +66,14 @@ myhw3ref3Server::upload
       (location_jv["traces"].isArray() == true))
     {
       id_str = location_jv["identity"].asString();
-      
+
+      // check whether the ID (id_str) exists in hw3_PTGR_map
       if (hw3_PTGR_map.find(id_str) != hw3_PTGR_map.end())
 	{
+	  // not equal (from the above line) ==> it exists
+	  // if the key doesn't exist, it will create a new entry for that key
+	  // ptgr_ptr = &(hw3_PTGR_map[id_str]);
+	  // if the key doesn't exist, it won't create a new entry for that key
 	  ptgr_ptr = &((hw3_PTGR_map.find(id_str))->second);
 	}
       else

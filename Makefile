@@ -100,7 +100,8 @@ Commutable.o:		Commutable.cpp Commutable.h $(CORE_INCS)
 Transaction.o:		Transaction.cpp Transaction.h $(CORE_INCS)
 	$(CC) -c $(CFLAGS) Transaction.cpp
 
-Personal_Timed_GPS_Record.o:	Personal_Timed_GPS_Record.cpp $(CORE_INCS)
+Personal_Timed_GPS_Record.o:	Personal_Timed_GPS_Record.cpp $(CORE_INCS) 	\
+				hw3ref3client.h hw3ref3server.h
 	$(CC) -c $(CFLAGS) Personal_Timed_GPS_Record.cpp
 
 Timed_Location.o:	Timed_Location.cpp $(CORE_INCS)

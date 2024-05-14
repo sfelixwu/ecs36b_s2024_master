@@ -142,7 +142,7 @@ Timed_Location::JSON2Object
   if (arg_json_ptr == ((Json::Value *) NULL))
     {
       ei_ptr = new Exception_Info {};
-      ei_ptr->where_code = ECS36B_ERROR_JSON2OBJECT_GPS_DD;
+      ei_ptr->where_code = ECS36B_ERROR_JSON2OBJECT_TIMED_LOCATION;
       ei_ptr->which_string = "default";
       ei_ptr->how_code = ECS36B_ERROR_NORMAL;
       ei_ptr->what_code = ECS36B_ERROR_NULL_JSON_PTR;
@@ -154,7 +154,7 @@ Timed_Location::JSON2Object
       (arg_json_ptr->isObject() != true))
     {
       ei_ptr = new Exception_Info {};
-      ei_ptr->where_code = ECS36B_ERROR_JSON2OBJECT_GPS_DD;
+      ei_ptr->where_code = ECS36B_ERROR_JSON2OBJECT_TIMED_LOCATION;
       ei_ptr->which_string = "default";
       ei_ptr->how_code = ECS36B_ERROR_NORMAL;
 
