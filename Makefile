@@ -16,20 +16,29 @@ CORE_INCS =	Core.h Person.h Post.h Comment.h Reaction.h		\
 		Action.h Link.h JvTime.h Tag.h Thing.h			\
 		Record.h GPS.h Labeled_GPS.h Commutable.h Team.h	\
 		Holdable.h Locatable.h Message.h OKey.h			\
-		Timed_Location.h ecs36b_Common.h ecs36b_Exception.h
+		Timed_Location.h ecs36b_Common.h ecs36b_Exception.h	\
+		Personal_Timed_GPS_Record.h
 
 CORE_OBJS =	Core.o Person.o Post.o Comment.o Reaction.o		\
 	 	Action.o Link.o JvTime.o Tag.o Thing.o OKey.o		\
 		Record.o GPS.o Labeled_GPS.o Commutable.o Team.o	\
 		Holdable.o Locatable.o ecs36b_JSON.o Message.o		\
-		Timed_Location.o ecs36b_Exception.o
+		Timed_Location.o ecs36b_Exception.o			\
+		Personal_Timed_GPS_Record.o
 
 # rules.
 all: 	ecs36bserver ecs36bupdate ecs36bsearch ecs36b_hw2_ref		\
-	ecs36b_hw3_ref_01 hw3ref2client hw3ref2server
+	ecs36b_hw3_ref_01 hw3ref2client hw3ref2server hw3ref3client	\
+	hw3ref3server
 
 #
 #
+
+hw3ref3client.h:	ecs36b_s2024_hw3ref3.json
+	jsonrpcstub ecs36b_s2024_hw3ref3.json --cpp-server=hw3ref3Server --cpp-client=hw3ref3Client
+
+hw3ref3server.h:	ecs36b_s2024_hw3ref3.json
+	jsonrpcstub ecs36b_s2024_hw3ref3.json --cpp-server=hw3ref3Server --cpp-client=hw3ref3Client
 
 hw3ref2client.h:	ecs36b_s2024_hw3ref2.json
 	jsonrpcstub ecs36b_s2024_hw3ref2.json --cpp-server=hw3ref2Server --cpp-client=hw3ref2Client
@@ -48,6 +57,12 @@ ecs36b_hw2_ref.o:	ecs36b_hw2_ref.cpp $(CORE_INCS)
 
 ecs36b_hw3_ref_01.o:	ecs36b_hw3_ref_01.cpp $(CORE_INCS)
 	$(CC) -c $(CFLAGS) ecs36b_hw3_ref_01.cpp
+
+hw3ref3client.o:	hw3ref3client.cpp hw3ref3client.h $(CORE_INCS)
+	$(CC) -c $(CFLAGS) hw3ref3client.cpp
+
+hw3ref3server.o:	hw3ref3server.cpp hw3ref3server.h $(CORE_INCS)
+	$(CC) -c $(CFLAGS) hw3ref3server.cpp
 
 hw3ref2client.o:	hw3ref2client.cpp hw3ref2client.h $(CORE_INCS)
 	$(CC) -c $(CFLAGS) hw3ref2client.cpp
@@ -85,7 +100,10 @@ Commutable.o:		Commutable.cpp Commutable.h $(CORE_INCS)
 Transaction.o:		Transaction.cpp Transaction.h $(CORE_INCS)
 	$(CC) -c $(CFLAGS) Transaction.cpp
 
-Timed_Location.o:	Timed_Location.cpp Timed_Location.h $(CORE_INCS)
+Personal_Timed_GPS_Record.o:	Personal_Timed_GPS_Record.cpp $(CORE_INCS)
+	$(CC) -c $(CFLAGS) Personal_Timed_GPS_Record.cpp
+
+Timed_Location.o:	Timed_Location.cpp $(CORE_INCS)
 	$(CC) -c $(CFLAGS) Timed_Location.cpp
 
 Record.o:		Record.cpp Record.h $(CORE_INCS)
@@ -139,6 +157,12 @@ ecs36b_hw2_ref:		$(CORE_OBJS) ecs36b_hw2_ref.o
 ecs36b_hw3_ref_01:		$(CORE_OBJS) ecs36b_hw3_ref_01.o
 	$(CC) -o ecs36b_hw3_ref_01 $(CORE_OBJS) ecs36b_hw3_ref_01.o $(LDFLAGS)
 
+hw3ref3client:		$(CORE_OBJS) hw3ref3client.o
+	$(CC) -o hw3ref3client $(CORE_OBJS) hw3ref3client.o $(LDFLAGS)
+
+hw3ref3server:		$(CORE_OBJS) hw3ref3server.o
+	$(CC) -o hw3ref3server $(CORE_OBJS) hw3ref3server.o $(LDFLAGS)
+
 hw3ref2client:		$(CORE_OBJS) hw3ref2client.o
 	$(CC) -o hw3ref2client $(CORE_OBJS) hw3ref2client.o $(LDFLAGS)
 
@@ -156,6 +180,10 @@ ecs36bserver:		$(CORE_OBJS) ecs36bserver.o
 
 clean:
 	rm -f	*.o *~ core ecs36bserver ecs36bupdate ecs36bsearch	\
-	      	ecs36bserver.h ecs36bclient.h 
+	      	ecs36bserver.h ecs36bclient.h hw3ref2server.h		\
+		hw3ref2client.h hw3ref3server.h hw3ref3client.h		\
+		hw3ref2client hw3ref2server				\
+		hw3ref3client hw3ref3server 				\
+		ecs36b_hw2_ref ecs36b_hw3_ref_01
 
 
