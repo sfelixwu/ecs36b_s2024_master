@@ -87,8 +87,7 @@ myFile2JSON
   int rc;
 
   char *json_str = myFile2String(f_name);
-  std::cout << f_name << std::endl;
-
+  // std::cout << f_name << std::endl;
   // std::cout << ((void *) json_str) << std::endl;
   // std::cout << jv_ptr << std::endl;
 

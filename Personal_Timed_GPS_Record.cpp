@@ -214,7 +214,7 @@ Shadow_Record::upload
     cerr << e.what() << endl;
   }
 
-  std::cout << result << std::endl;
+  // std::cout << result << std::endl;
   return true;
 }
 
@@ -238,11 +238,11 @@ Shadow_Record::question
   if (jv_ptr != NULL) delete jv_ptr;
   
   GPS_DD answer;
-  std::cout << result << std::endl;
+  // std::cout << result << std::endl;
   if ((result["latitude"].isNull() == true)   ||
       (result["latitude"].isDouble() != true) ||
       (result["longitude"].isNull() == true)   ||
-      (result["longtitude"].isDouble() != true)
+      (result["longitude"].isDouble() != true)
       )
     {
       answer.latitude  = 0.0;
@@ -253,6 +253,8 @@ Shadow_Record::question
       answer.JSON2Object(&result);
     }
 
+  // std::cout << result << std::endl;
+  
   return answer;
 }
 
