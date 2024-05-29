@@ -28,7 +28,7 @@ main(int argc, char *argv[])
   // step 2: process the input
   Json::Value location_jv;
   rc = myFile2JSON(argv[1], &location_jv);
-  std::cout << location_jv << std::endl;
+  // std::cout << location_jv << std::endl;
   if (rc != 0)
     {
       std::cout << "error arg1 " << rc << std::endl;
@@ -37,7 +37,7 @@ main(int argc, char *argv[])
   
   Json::Value question_jv;
   rc = myFile2JSON(argv[2], &question_jv);
-  std::cout << question_jv << std::endl;
+  // std::cout << question_jv << std::endl;
   if (rc != 0)
     {
       std::cout << "error arg2 " << rc << std::endl;
@@ -48,6 +48,7 @@ main(int argc, char *argv[])
   std::vector<Timed_Location> hw3_TL_vector;
   Json::Value *jv_ptr = (Json::Value *) NULL;
 
+#ifdef EEE
   if ((location_jv["identity"].isNull() != true) &&
       (location_jv["identity"].isString() == true) &&
       (location_jv["traces"].isNull() != true) &&
@@ -67,7 +68,7 @@ main(int argc, char *argv[])
 	      ((location_jv["traces"][i]["time"]["time"]).isNull() != true)            &&
 	      ((location_jv["traces"][i]["time"]["time"]).isString() == true))
 	    {
-	      std::cout << "..\n";
+	      // std::cout << "..\n";
 	    }
 	  else
 	    {
@@ -75,7 +76,7 @@ main(int argc, char *argv[])
 	      return -1;
 	    }
 	}
-      std::cout << "checked\n";
+      // std::cout << "checked\n";
     }
   else
     {
@@ -83,21 +84,9 @@ main(int argc, char *argv[])
       return -1;
     }
 
-  // JSONRPC client set-up  
-  HttpClient httpclient { "http://localhost:8300" };
-  hw3ref3Client myClient { httpclient, JSONRPC_CLIENT_V2 };
-  Json::Value result;
+#endif /* EEE*/
   
-  // upload traces
-  try {
-    result = myClient.upload(location_jv);
-    cout << result.toStyledString() << endl;
-  } catch (JsonRpcException &e) {
-    cerr << e.what() << endl;
-  }
-
   std::string jvt_s;
-  
   // check question JSON
   if (((question_jv["time"]).isNull() != true)    &&
       ((question_jv["time"]).isObject() == true)  &&
@@ -106,7 +95,7 @@ main(int argc, char *argv[])
       ((question_jv["time"]["time"]).isNull() != true)    &&
       ((question_jv["time"]["time"]).isString() == true))
     {
-      std::cout << "checked\n";
+      // std::cout << "checked\n";
       jvt_s = (question_jv["time"]["time"]).asString();
     }
   else
@@ -117,37 +106,21 @@ main(int argc, char *argv[])
 
   JvTime jvt_question { jvt_s.c_str() };
 
-  // question
-  try {
-    result = myClient.question(question_jv);
-    cout << result.toStyledString() << endl;
-  } catch (JsonRpcException &e) {
-    cerr << e.what() << endl;
-  }
-
   Personal_Timed_GPS_Record *x_ptr;
   
-  // now local object (Real object here)
-  Personal_Timed_GPS_Record my_local_ptgr;
-  my_local_ptgr.identity = location_jv["identity"].asString();
-  x_ptr = &my_local_ptgr;
-  // my_local_ptgr.upload(location_jv);
-  x_ptr->upload(location_jv);
-  GPS_DD my_local_answer = my_local_ptgr.question(jvt_question);
-  std::cout << *(my_local_answer.dump2JSON()) << std::endl;
-
   // now proxy object (Real object at URL)
   Shadow_Record shadow_object_1001;
   shadow_object_1001.host_url = "http://localhost:8300";
   shadow_object_1001.identity = location_jv["identity"].asString();
+  
   x_ptr = &shadow_object_1001;
-  // shadow_object_1001.upload(location_jv);
+
+  // at this point ==> pointer to an PTGR object
   x_ptr->upload(location_jv);
-  GPS_DD my_remote_answer = shadow_object_1001.question(jvt_question);
+  
+  GPS_DD my_remote_answer = x_ptr->question(jvt_question);
+  
   std::cout << *(my_remote_answer.dump2JSON()) << std::endl;
 
-  // now trying the overloaded pointer operator under Shadow
-  std::cout << "number of elements is " << (shadow_object_1001->traces).size()
-	    << ".\n";
   return 0;
 }

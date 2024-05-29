@@ -5,6 +5,73 @@
 #include "ecs36b_Common.h"
 #include "JvTime.h"
 
+// pre-check will check null pointer, JSON object format
+
+void
+JSON2Object_precheck
+(Json::Value * arg_json_ptr, ecs36b_Exception * arg_exception_ptr,
+ int arg_where_code)
+{
+  Exception_Info * ei_ptr = NULL;
+
+  if (arg_json_ptr == ((Json::Value *) NULL))
+    {
+      ei_ptr = new Exception_Info {};
+      ei_ptr->where_code = arg_where_code;
+      ei_ptr->which_string = "default";
+      ei_ptr->how_code = ECS36B_ERROR_NORMAL;
+      ei_ptr->what_code = ECS36B_ERROR_NULL_JSON_PTR;
+      ei_ptr->array_index = 0;
+      (arg_exception_ptr->info_vector).push_back(ei_ptr);
+      throw (*arg_exception_ptr);
+    }
+  
+  if ((arg_json_ptr->isNull() == true) ||
+      (arg_json_ptr->isObject() != true))
+    {
+      ei_ptr = new Exception_Info {};
+      ei_ptr->where_code = arg_where_code;
+      ei_ptr->which_string = "default";
+      ei_ptr->how_code = ECS36B_ERROR_NORMAL;
+
+      if (arg_json_ptr->isNull() == true)
+	{
+	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_MISSING;
+	}
+      else
+	{
+	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
+	}
+      
+      ei_ptr->array_index = 0;
+
+      (arg_exception_ptr->info_vector).push_back(ei_ptr);
+      throw (*arg_exception_ptr);
+    }
+  
+  return;
+}
+
+void
+JSON2Object_appendEI
+(ecs36b_Exception& arg_e, ecs36b_Exception *arg_exception_ptr,
+ unsigned int arg_index)
+{
+  // this should not happen...
+  if (arg_exception_ptr == NULL) return;
+  
+  int ei;
+  for (ei = 0; ei < (arg_e.info_vector).size(); ei++)
+    {
+      Exception_Info * ei_ptr_copy = new Exception_Info {};
+      (*ei_ptr_copy) = (*((arg_e.info_vector)[ei]));
+      ei_ptr_copy->array_index = arg_index;
+      (arg_exception_ptr->info_vector).push_back(ei_ptr_copy);
+    }
+  arg_e.myDestructor();
+  return;
+}
+
 void
 myPrintLog
 (std::string content, std::string fname)

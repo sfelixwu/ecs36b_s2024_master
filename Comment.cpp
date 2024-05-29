@@ -144,6 +144,9 @@ Comment::JSON2Object
   Exception_Info * ei_ptr = NULL;
   ecs36b_Exception * lv_exception_ptr = new ecs36b_Exception {};
 
+  JSON2Object_precheck(arg_json_ptr, lv_exception_ptr,
+		       ECS36B_ERROR_JSON2OBJECT_COMMENT);
+  
   if (arg_json_ptr == ((Json::Value *) NULL))
     {
       ei_ptr = new Exception_Info {};
@@ -151,6 +154,7 @@ Comment::JSON2Object
       ei_ptr->which_string = "default";
       ei_ptr->how_code = ECS36B_ERROR_NORMAL;
       ei_ptr->what_code = ECS36B_ERROR_NULL_JSON_PTR;
+      ei_ptr->array_index = 0;
       (lv_exception_ptr->info_vector).push_back(ei_ptr);
       throw (*lv_exception_ptr);
     }
@@ -171,6 +175,9 @@ Comment::JSON2Object
 	{
 	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
 	}
+
+      ei_ptr->array_index = 0;
+
       (lv_exception_ptr->info_vector).push_back(ei_ptr);
       throw (*lv_exception_ptr);
     }
@@ -192,6 +199,9 @@ Comment::JSON2Object
 	{
 	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
 	}
+
+      ei_ptr->array_index = 0;
+
       (lv_exception_ptr->info_vector).push_back(ei_ptr);
     }
   else
@@ -204,6 +214,7 @@ Comment::JSON2Object
 	  ei_ptr->which_string = "id";
 	  ei_ptr->how_code = ECS36B_ERROR_NORMAL;
 	  ei_ptr->what_code = rc;
+	  ei_ptr->array_index = 0;
 	  (lv_exception_ptr->info_vector).push_back(ei_ptr);
 	}
     }
@@ -225,6 +236,9 @@ Comment::JSON2Object
 	{
 	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
 	}
+
+      ei_ptr->array_index = 0;
+
       (lv_exception_ptr->info_vector).push_back(ei_ptr);
     }
   else
@@ -239,14 +253,7 @@ Comment::JSON2Object
 	}
       catch(ecs36b_Exception e)
 	{
-	  int i;
-	  for (i = 0; i < (e.info_vector).size(); i++)
-	    {
-	      Exception_Info * ei_ptr_copy = new Exception_Info {};
-	      (*ei_ptr_copy) = (*((e.info_vector)[i]));
-	      (lv_exception_ptr->info_vector).push_back(ei_ptr_copy);
-	    }
-	  e.myDestructor();
+	  JSON2Object_appendEI(e, lv_exception_ptr, 0);
 	}
     }
 
@@ -267,6 +274,9 @@ Comment::JSON2Object
 	{
 	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
 	}
+      
+      ei_ptr->array_index = 0;
+
       (lv_exception_ptr->info_vector).push_back(ei_ptr);
     }
   else
@@ -281,14 +291,7 @@ Comment::JSON2Object
 	}
       catch(ecs36b_Exception e)
 	{
-	  int i;
-	  for (i = 0; i < (e.info_vector).size(); i++)
-	    {
-	      Exception_Info * ei_ptr_copy = new Exception_Info {};
-	      (*ei_ptr_copy) = (*((e.info_vector)[i]));
-	      (lv_exception_ptr->info_vector).push_back(ei_ptr_copy);
-	    }
-	  e.myDestructor();
+	  JSON2Object_appendEI(e, lv_exception_ptr, 0);
 	}
     }
 
@@ -309,6 +312,9 @@ Comment::JSON2Object
 	{
 	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
 	}
+
+      ei_ptr->array_index = 0;
+
       (lv_exception_ptr->info_vector).push_back(ei_ptr);
     }
   else
@@ -323,14 +329,7 @@ Comment::JSON2Object
 	}
       catch(ecs36b_Exception e)
 	{
-	  int i;
-	  for (i = 0; i < (e.info_vector).size(); i++)
-	    {
-	      Exception_Info * ei_ptr_copy = new Exception_Info {};
-	      (*ei_ptr_copy) = (*((e.info_vector)[i]));
-	      (lv_exception_ptr->info_vector).push_back(ei_ptr_copy);
-	    }
-	  e.myDestructor();
+	  JSON2Object_appendEI(e, lv_exception_ptr, 0);
 	}
     }
 
@@ -352,6 +351,9 @@ Comment::JSON2Object
 	{
 	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
 	}
+
+      ei_ptr->array_index = 0;
+
       (lv_exception_ptr->info_vector).push_back(ei_ptr);
     }
   else
@@ -372,6 +374,9 @@ Comment::JSON2Object
 	    {
 	      ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
 	    }
+
+	  ei_ptr->array_index = 0;
+
 	  (lv_exception_ptr->info_vector).push_back(ei_ptr);
 	}
       else
@@ -381,10 +386,10 @@ Comment::JSON2Object
 	      this->reactions = new vector<Reaction *>();
 	    }
 
-	  int j;
-	  for (j = 0; j < ((*arg_json_ptr)["reactions"]["data"]).size(); j++)
+	  int ai;
+	  for (ai = 0; ai < ((*arg_json_ptr)["reactions"]["data"]).size(); ai++)
 	    {
-	      Json::Value l_jv_reaction = (*arg_json_ptr)["reactions"]["data"][j];
+	      Json::Value l_jv_reaction = (*arg_json_ptr)["reactions"]["data"][ai];
 	      Reaction *l_reaction_ptr = new Reaction();
 	      try
 		{
@@ -392,14 +397,7 @@ Comment::JSON2Object
 		}
 	      catch(ecs36b_Exception e)
 		{
-		  int i;
-		  for (i = 0; i < (e.info_vector).size(); i++)
-		    {
-		      Exception_Info * ei_ptr_copy = new Exception_Info {};
-		      (*ei_ptr_copy) = (*((e.info_vector)[i]));
-		      (lv_exception_ptr->info_vector).push_back(ei_ptr_copy);
-		    }
-		  e.myDestructor();
+		  JSON2Object_appendEI(e, lv_exception_ptr, ai);
 		}
 
 	      // now check if the reaction already exist
@@ -446,6 +444,9 @@ Comment::JSON2Object
 	{
 	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
 	}
+
+      ei_ptr->array_index = 0;
+
       (lv_exception_ptr->info_vector).push_back(ei_ptr);
     }
   else
@@ -466,6 +467,9 @@ Comment::JSON2Object
 	    {
 	      ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
 	    }
+
+	  ei_ptr->array_index = 0;
+	  
 	  (lv_exception_ptr->info_vector).push_back(ei_ptr);
 	}
       else
@@ -475,10 +479,10 @@ Comment::JSON2Object
 	      this->tags = new vector<Tag *>();
 	    }
 
-	  int j;
-	  for (j = 0; j < ((*arg_json_ptr)["tags"]["data"]).size(); j++)
+	  int ai;
+	  for (ai = 0; ai < ((*arg_json_ptr)["tags"]["data"]).size(); ai++)
 	    {
-	      Json::Value l_jv_tag = (*arg_json_ptr)["tags"]["data"][j];
+	      Json::Value l_jv_tag = (*arg_json_ptr)["tags"]["data"][ai];
 	      Tag *l_tag_ptr = new Tag();
 	      try
 		{
@@ -486,14 +490,7 @@ Comment::JSON2Object
 		}
 	      catch(ecs36b_Exception e)
 		{
-		  int i;
-		  for (i = 0; i < (e.info_vector).size(); i++)
-		    {
-		      Exception_Info * ei_ptr_copy = new Exception_Info {};
-		      (*ei_ptr_copy) = (*((e.info_vector)[i]));
-		      (lv_exception_ptr->info_vector).push_back(ei_ptr_copy);
-		    }
-		  e.myDestructor();
+		  JSON2Object_appendEI(e, lv_exception_ptr, ai);
 		}
 
 	      // now check if the tag already exist

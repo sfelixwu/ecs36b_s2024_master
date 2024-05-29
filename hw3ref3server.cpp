@@ -81,9 +81,17 @@ myhw3ref3Server::upload
 	  ptgr_ptr = &ptgr_data;
 	}
 
-      Json::Value my_jv = location_jv;
-      ptgr_ptr->JSON2Object(&my_jv);
-
+      try {
+	Json::Value my_jv = location_jv; // original
+	ptgr_ptr->JSON2Object(&my_jv);   // original
+      } catch(ecs36b_Exception e) {
+	result["status"] = "ecs36b_Exception caught";
+	Json::Value exception_jv = *(e.dump2JSON());
+	e.myDestructor();
+	result["exceptions"] = exception_jv;
+	return result;
+      }
+      
       TL_Sort(ptgr_ptr->traces);
       std::vector<Timed_Location> * unique_ptr = NULL;
       unique_ptr = TL_Unique(ptgr_ptr->traces);
@@ -159,9 +167,11 @@ myhw3ref3Server::question
     {
       ptgr_ptr = &((hw3_PTGR_map.find(id_str))->second);
       answer = ptgr_ptr->question(jvt_question);
-      std::cout << answer.latitude << std::endl;
-      std::cout << answer.longitude << std::endl;      
+      // std::cout << answer.latitude << std::endl;
+      // std::cout << answer.longitude << std::endl;      
       result["status"] = "successful";
+      result["latitude"]  = answer.latitude;
+      result["longitude"] = answer.longitude;
     }
   else
     {

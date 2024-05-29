@@ -58,38 +58,10 @@ Team::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  ecs36b_Exception lv_exception {};
+  ecs36b_Exception *lv_exception_ptr = new ecs36b_Exception();
 
-  if (arg_json_ptr == ((Json::Value *) NULL))
-    {
-      ei_ptr = new Exception_Info {};
-      ei_ptr->where_code = ECS36B_ERROR_JSON2OBJECT_TEAM;
-      ei_ptr->which_string = "default";
-      ei_ptr->how_code = ECS36B_ERROR_NORMAL;
-      ei_ptr->what_code = ECS36B_ERROR_NULL_JSON_PTR;
-      (lv_exception.info_vector).push_back(ei_ptr);
-      throw lv_exception;
-    }
-
-  if ((arg_json_ptr->isNull() == true) ||
-      (arg_json_ptr->isObject() != true))
-    {
-      ei_ptr = new Exception_Info {};
-      ei_ptr->where_code = ECS36B_ERROR_JSON2OBJECT_TEAM;
-      ei_ptr->which_string = "default";
-      ei_ptr->how_code = ECS36B_ERROR_NORMAL;
-
-      if (arg_json_ptr->isNull() == true)
-	{
-	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_MISSING;
-	}
-      else
-	{
-	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
-	}
-      (lv_exception.info_vector).push_back(ei_ptr);
-      throw lv_exception;
-    }
+  JSON2Object_precheck(arg_json_ptr, lv_exception_ptr,
+		       ECS36B_ERROR_JSON2OBJECT_TEAM);
 
   if (((*arg_json_ptr)["name"].isNull() == true) ||
       ((*arg_json_ptr)["name"].isString() == false))
@@ -107,7 +79,10 @@ Team::JSON2Object
 	{
 	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
 	}
-      (lv_exception.info_vector).push_back(ei_ptr);
+
+      ei_ptr->array_index = 0;
+      
+      (lv_exception_ptr->info_vector).push_back(ei_ptr);
     }
   else
     {
@@ -131,7 +106,10 @@ Team::JSON2Object
 	{
 	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
 	}
-      (lv_exception.info_vector).push_back(ei_ptr);
+
+      ei_ptr->array_index = 0;
+
+      (lv_exception_ptr->info_vector).push_back(ei_ptr);
     }
   else
     {
@@ -151,7 +129,10 @@ Team::JSON2Object
 	    {
 	      ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
 	    }
-	  (lv_exception.info_vector).push_back(ei_ptr);
+
+	  ei_ptr->array_index = 0;
+
+	  (lv_exception_ptr->info_vector).push_back(ei_ptr);
 	}
       else
 	{
@@ -160,52 +141,48 @@ Team::JSON2Object
 	      this->members = new vector<Person *>();
 	    }
 
-	  int j;
-	  for (j = 0; j < ((*arg_json_ptr)["members"]["data"]).size(); j++)
+	  int ai;
+	  for (ai = 0; ai < ((*arg_json_ptr)["members"]["data"]).size(); ai++)
 	    {
-	      Json::Value l_jv_member = (*arg_json_ptr)["members"]["data"][j];
+	      Json::Value l_jv_member = (*arg_json_ptr)["members"]["data"][ai];
 	      Person *l_member_ptr = new Person();
 	      try
 		{
 		  l_member_ptr->JSON2Object(&(l_jv_member));
-
-		  // now check if the reaction already exist
-		  int flag_mb = 0;
-		  vector<Person *>::iterator my_it_mb;
-		  for (my_it_mb = (*(this->members)).begin();
-		       my_it_mb < (*(this->members)).end(); my_it_mb++)
-		    {
-		      // operator== for Person
-		      if ((*(*my_it_mb)) == (*(l_member_ptr)))
-			{
-			  flag_mb = 1;
-			}
-		    }
-
-		  if (flag_mb == 0)
-		    {
-		      (*(this->members)).push_back(l_member_ptr);
-		    }
-		  else
-		    {
-		      delete l_member_ptr;
-		    }
 		}
 	      catch(ecs36b_Exception e)
 		{
-		  int i;
-		  for (i = 0; i < (e.info_vector).size(); i++)
+		  JSON2Object_appendEI(e, lv_exception_ptr, ai);
+		}
+	      
+	      // now check if the member already exist
+	      int flag_mb = 0;
+	      vector<Person *>::iterator my_it_mb;
+	      for (my_it_mb = (*(this->members)).begin();
+		   my_it_mb < (*(this->members)).end(); my_it_mb++)
+		{
+		  // operator== for Person
+		  if ((*(*my_it_mb)) == (*(l_member_ptr)))
 		    {
-		      (lv_exception.info_vector).push_back((e.info_vector)[i]);
+		      flag_mb = 1;
 		    }
+		}
+
+	      if (flag_mb == 0)
+		{
+		  (*(this->members)).push_back(l_member_ptr);
+		}
+	      else
+		{
+		  delete l_member_ptr;
 		}
 	    }
 	}
     }
 
-  if ((lv_exception.info_vector).size() != 0)
+  if ((lv_exception_ptr->info_vector).size() != 0)
     {
-      throw lv_exception;
+      throw (*lv_exception_ptr);
     }
 
   return;

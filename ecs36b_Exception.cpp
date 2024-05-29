@@ -38,6 +38,7 @@ ecs36b_Exception::dump2JSON
       (*dumpjv_ptr)["what"]   = error_string(((this->info_vector)[i])->what_code);
       (*dumpjv_ptr)["which"]  = ((this->info_vector)[i])->which_string;
       (*dumpjv_ptr)["how"]    = error_string(((this->info_vector)[i])->how_code);
+      (*dumpjv_ptr)["index"]  = ((this->info_vector)[i])->array_index;
       json_info[i] = (*dumpjv_ptr);
       delete dumpjv_ptr;
     }

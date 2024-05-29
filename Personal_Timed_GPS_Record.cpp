@@ -75,36 +75,8 @@ Personal_Timed_GPS_Record::JSON2Object
   Exception_Info * ei_ptr = NULL;
   ecs36b_Exception *lv_exception_ptr = new ecs36b_Exception();
 
-  if (arg_json_ptr == ((Json::Value *) NULL))
-    {
-      ei_ptr = new Exception_Info {};
-      ei_ptr->where_code = ECS36B_ERROR_JSON2OBJECT_PERSONAL_TIMED_GPS_RECORD;
-      ei_ptr->which_string = "default";
-      ei_ptr->how_code = ECS36B_ERROR_NORMAL;
-      ei_ptr->what_code = ECS36B_ERROR_NULL_JSON_PTR;
-      (lv_exception_ptr->info_vector).push_back(ei_ptr);
-      throw (*lv_exception_ptr);
-    }
-  
-  if ((arg_json_ptr->isNull() == true) ||
-      (arg_json_ptr->isObject() != true))
-    {
-      ei_ptr = new Exception_Info {};
-      ei_ptr->where_code = ECS36B_ERROR_JSON2OBJECT_PERSONAL_TIMED_GPS_RECORD;
-      ei_ptr->which_string = "default";
-      ei_ptr->how_code = ECS36B_ERROR_NORMAL;
-
-      if (arg_json_ptr->isNull() == true)
-	{
-	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_MISSING;
-	}
-      else
-	{
-	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
-	}
-      (lv_exception_ptr->info_vector).push_back(ei_ptr);
-      throw (*lv_exception_ptr);
-    }
+  JSON2Object_precheck(arg_json_ptr, lv_exception_ptr,
+		       ECS36B_ERROR_JSON2OBJECT_PERSONAL_TIMED_GPS_RECORD);
 
   if ((((*arg_json_ptr)["identity"]).isNull() == true) ||
       (((*arg_json_ptr)["identity"]).isString() != true))
@@ -122,6 +94,9 @@ Personal_Timed_GPS_Record::JSON2Object
 	{
 	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
 	}
+      
+      ei_ptr->array_index = 0;
+      
       (lv_exception_ptr->info_vector).push_back(ei_ptr);
     }
   else
@@ -132,14 +107,7 @@ Personal_Timed_GPS_Record::JSON2Object
 	}
       catch(ecs36b_Exception e)
 	{
-	  int i;
-	  for (i = 0; i < (e.info_vector).size(); i++)
-	    {
-	      Exception_Info * ei_ptr_copy = new Exception_Info {};
-	      (*ei_ptr_copy) = (*((e.info_vector)[i]));
-	      (lv_exception_ptr->info_vector).push_back(ei_ptr_copy);
-	    }
-	  e.myDestructor();
+	  JSON2Object_appendEI(e, lv_exception_ptr, 0);
 	}
     }
 
@@ -159,31 +127,26 @@ Personal_Timed_GPS_Record::JSON2Object
 	{
 	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
 	}
+      ei_ptr->array_index = 0;
+
       (lv_exception_ptr->info_vector).push_back(ei_ptr);
     }
   else
     {
-      try
+      int ai;
+      for (ai = 0; ai < ((*arg_json_ptr)["traces"]).size(); ai++)
 	{
-	  int i;
-	  for (i = 0; i < ((*arg_json_ptr)["traces"]).size(); i++)
+	  try
 	    {
 	      Timed_Location *lvTL_ptr = new Timed_Location();
-	      lvTL_ptr->JSON2Object(&((*arg_json_ptr)["traces"][i]));
+	      lvTL_ptr->JSON2Object(&((*arg_json_ptr)["traces"][ai]));
 	      this->traces.push_back(*(lvTL_ptr));
 	      delete lvTL_ptr;
 	    }
-	}
-      catch(ecs36b_Exception e)
-	{
-	  int i;
-	  for (i = 0; i < (e.info_vector).size(); i++)
+	  catch(ecs36b_Exception e)
 	    {
-	      Exception_Info * ei_ptr_copy = new Exception_Info {};
-	      (*ei_ptr_copy) = (*((e.info_vector)[i]));
-	      (lv_exception_ptr->info_vector).push_back(ei_ptr_copy);
+	      JSON2Object_appendEI(e, lv_exception_ptr, ai);
 	    }
-	  e.myDestructor();
 	}
     }
   
@@ -210,6 +173,9 @@ Shadow_Record::upload
 
   try {
     result = myClient.upload(arg_jv);
+
+    std::cout << result << std::endl;
+    
     } catch (JsonRpcException &e) {
     cerr << e.what() << endl;
   }

@@ -47,6 +47,9 @@ Action::JSON2Object
   Exception_Info * ei_ptr = NULL;
   ecs36b_Exception * lv_exception_ptr = new ecs36b_Exception {};
 
+  JSON2Object_precheck(arg_json_ptr, lv_exception_ptr,
+		       ECS36B_ERROR_JSON2OBJECT_ACTION);
+
   if (arg_json_ptr == ((Json::Value *) NULL))
     {
       ei_ptr = new Exception_Info {};
@@ -54,6 +57,7 @@ Action::JSON2Object
       ei_ptr->which_string = "default";
       ei_ptr->how_code = ECS36B_ERROR_NORMAL;
       ei_ptr->what_code = ECS36B_ERROR_NULL_JSON_PTR;
+      ei_ptr->array_index = 0;
       (lv_exception_ptr->info_vector).push_back(ei_ptr);
       throw (*lv_exception_ptr);
     }
@@ -74,6 +78,9 @@ Action::JSON2Object
 	{
 	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
 	}
+
+      ei_ptr->array_index = 0;
+
       (lv_exception_ptr->info_vector).push_back(ei_ptr);
       throw (*lv_exception_ptr);
     }
@@ -84,14 +91,7 @@ Action::JSON2Object
     }
   catch(ecs36b_Exception e)
     {
-      int i;
-      for (i = 0; i < (e.info_vector).size(); i++)
-	{
-	  Exception_Info * ei_ptr_copy = new Exception_Info {};
-	  (*ei_ptr_copy) = (*((e.info_vector)[i]));
-	  (lv_exception_ptr->info_vector).push_back(ei_ptr_copy);
-	}
-      e.myDestructor();
+      JSON2Object_appendEI(e, lv_exception_ptr, 0);
     }
 
   if (((*arg_json_ptr)["name"].isNull() == true) ||
@@ -110,6 +110,9 @@ Action::JSON2Object
 	{
 	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
 	}
+
+      ei_ptr->array_index = 0;
+
       (lv_exception_ptr->info_vector).push_back(ei_ptr);
     }
   else
