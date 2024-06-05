@@ -247,7 +247,9 @@ JvTime::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  ecs36b_Exception * lv_exception_ptr = new ecs36b_Exception {};
+  
+  ecs36b_Exception lv_exception {};
+  ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
   JSON2Object_precheck(arg_json_ptr, lv_exception_ptr,
 		       ECS36B_ERROR_JSON2OBJECT_JVTIME);

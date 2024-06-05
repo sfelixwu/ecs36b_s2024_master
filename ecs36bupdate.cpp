@@ -91,20 +91,20 @@ main
 
   vector<JSON_Diff *> *lv_diff = JSON_Difference(lv_1st, lv_2nd, lv_prefix);
 
-  std::cout << "Difference Begin\n";
+  // std::cout << "Difference Begin\n";
   int i;
   for (i = 0; i < lv_diff->size(); i++)
     {
-      std::cout << (*(((*lv_diff)[i])->dump2JSON())) << std::endl;
+      // std::cout << (*(((*lv_diff)[i])->dump2JSON())) << std::endl;
     }
-  std::cout << "Difference End\n";
+  // std::cout << "Difference End\n";
 
   // start
   Json::Value jv;
   int rc = myFile2JSON(argv[1], &jv);
 
   fprintf(stdout, "rc = %d\n", rc);
-  std::cout << jv << std::endl;
+  // std::cout << jv << std::endl;
   
   // vector<basic_string<char, char_traits<char>, std::allocator<char>>> members;
   vector<std::string> members;
@@ -112,9 +112,9 @@ main
   int k;
   for (k = 0; k < members.size(); k++)
     {
-      fprintf(stdout, "%d\n", k);
-      std::cout << members[k] << std::endl;
-      fflush(stdout);
+      // fprintf(stdout, "%d\n", k);
+      // std::cout << members[k] << std::endl;
+      // fflush(stdout);
     }
 
   Exception_Info * ei_ptr = NULL;
@@ -144,7 +144,8 @@ main
       lv_exception_ptr->myDestructor();
     }
 
-  HttpClient httpclient("http://localhost:8384");
+  HttpClient httpclient("https://ethikos.ngrok.io");
+  // HttpClient httpclient("http://localhost:8384");
   // HttpClient httpclient("http://169.237.6.102:55407");
   // HttpClient httpclient("http://169.237.6.102:55408");
   ecs36bClient myClient(httpclient, JSONRPC_CLIENT_V2);
@@ -152,8 +153,9 @@ main
   Json::Value result_json;
 
   try {
-    std::cout << (post_ptr->dump2JSON())->toStyledString() << std::endl;
-    result_json = myClient.update((post_ptr->dump2JSON())->toStyledString());
+    // std::cout << (post_ptr->dump2JSON())->toStyledString() << std::endl;
+    // result_json = myClient.update((post_ptr->dump2JSON())->toStyledString());
+    result_json = myClient.update(jv.toStyledString());
     std::cout << result_json.toStyledString() << endl;
   } catch (JsonRpcException &e) {
     cerr << e.what() << endl;

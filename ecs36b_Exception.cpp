@@ -5,16 +5,16 @@ void
 ecs36b_Exception::myDestructor
 (void)
 {
-  int i;
+  int ei;
 
   // std::cout << "my destructor ecs36b_Exception\n";
   // std::cout << this << std::endl;
 
-  for (i = 0; i < (this->info_vector).size(); i++)
+  for (ei = 0; ei < (this->info_vector).size(); ei++)
     {
-      if (info_vector[i] != NULL)
+      if ((this->info_vector)[ei] != NULL)
 	{
-	  delete info_vector[i];
+	  delete (this->info_vector)[ei];
 	}
     }
   
@@ -42,7 +42,7 @@ ecs36b_Exception::dump2JSON
       json_info[i] = (*dumpjv_ptr);
       delete dumpjv_ptr;
     }
-  json_info_array["data"] = json_info;
+  json_info_array["data"]  = json_info;
   json_info_array["count"] = ((int) (this->info_vector).size());
   (*result_ptr)["ecs36b exceptions"] = json_info_array;
   return result_ptr;

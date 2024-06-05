@@ -14,7 +14,9 @@ Person::Person(std::string arg_vsID, std::string arg_name, GPS_DD * arg_home_ptr
   this->class_name = "Person";
   this->vsID = arg_vsID;
   this->name = arg_name;
-  this->home = arg_home_ptr;
+  // was: this->home = arg_home_ptr;
+  this->home = new GPS_DD { arg_home_ptr->latitude, arg_home_ptr->longitude };
+
 }
 
 Person::Person()
@@ -37,7 +39,8 @@ void
 Person::setHome
 (GPS_DD * arg_home_ptr)
 {
-  this->home = arg_home_ptr;
+  // was: this->home = arg_home_ptr;
+  this->home = new GPS_DD { arg_home_ptr->latitude, arg_home_ptr->longitude };
 }
 
 GPS_DD *
@@ -66,6 +69,7 @@ Person::operator==
 // (Person& aPerson)
 // (Person * aPerson)
 {
+  printf("Person::operator==\n");
   return (this->vsID == aPerson.getvsID());
 
   // return ((this->vsID == aPerson.getvsID()) &&
@@ -95,6 +99,7 @@ Person::dump2JSON
 	{
 	  (*result_ptr)["home"] = *jv_ptr;
 	}
+      delete jv_ptr;
     }
 
   return result_ptr;
@@ -105,7 +110,9 @@ Person::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  ecs36b_Exception * lv_exception_ptr = new ecs36b_Exception {};
+
+  ecs36b_Exception lv_exception {};
+  ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
   JSON2Object_precheck(arg_json_ptr, lv_exception_ptr,
 		       ECS36B_ERROR_JSON2OBJECT_PERSON);
@@ -195,6 +202,7 @@ Person::JSON2Object
 	}
       catch(ecs36b_Exception e)
 	{
+	  printf("Person Home exp\n");
 	  JSON2Object_appendEI(e, lv_exception_ptr, 0);
 	}
     }

@@ -26,22 +26,18 @@ Myecs36bServer::Myecs36bServer(AbstractServerConnector &connector, serverVersion
 
 // member functions
 
-#define BUFSIZE 1024
-
 Json::Value
 Myecs36bServer::update(const std::string& updating_json)
 {
   Json::Value result_json;
-  char fname_buf[BUFSIZE];
+  char fname_buf[1024];
   FILE * post_f_ptr;
   int rc = ECS36B_ERROR_NORMAL;
   bool brc = false;
   Post * post_ptr = NULL;
-  unsigned int exception_count = 0;
-  
-  std::cout << "update" << " " << updating_json << std::endl;
 
 #ifdef _ECS36B_DEBUG_
+  std::cout << "update" << " " << updating_json << std::endl;
 #endif /* _ECS36B_DEBUG_ */
 
   Exception_Info * ei_ptr = NULL;
@@ -101,7 +97,7 @@ Myecs36bServer::update(const std::string& updating_json)
 	  throw (*lv_exception_ptr);
 	}
 
-      bzero(fname_buf, BUFSIZE);
+      bzero(fname_buf, 1024);
       snprintf(fname_buf,
 	       strlen("./posts/post_.json") +
 	       strlen(((myv_message["id"]).asString()).c_str()) + 1,
@@ -109,17 +105,44 @@ Myecs36bServer::update(const std::string& updating_json)
   
       std::cout << "name: " << fname_buf << std::endl;
       
+      // before we do anything, let us check the history section
+      if (((myv_message["history"]).isNull() != true) &&
+	  ((myv_message["history"]["data"]).isNull() != true) &&
+	  ((myv_message["history"]["data"]).isArray() == true) &&
+	  ((myv_message["history"]["data"]).size() > 0) &&
+	  ((myv_message["history"]["count"]).isInt() == true) &&
+	  ((myv_message["history"]["count"]).asInt() > 0))
+	{
+	  int i;
+	  for (i = 0; i < (myv_message["history"]["data"]).size(); i++)
+	    {
+	      Json::Value l_jv = myv_message["history"]["data"][i];
+
+	      if (((l_jv["vsID"]).isNull() == true) ||
+		  ((l_jv["vsID"]).isString() != true))
+		{
+		  ei_ptr = new Exception_Info {};
+		  ei_ptr->where_code = ECS36B_ERROR_JSONRPC_SERVER;
+		  ei_ptr->which_string = "update history VSID error";
+		  ei_ptr->how_code = ECS36B_ERROR_NORMAL;
+		  ei_ptr->what_code = ECS36B_ERROR_VSID_HISTORY;
+		  (lv_exception_ptr->info_vector).push_back(ei_ptr);
+		  // this vsID cannot be retrieved.
+		}
+	    }
+	}
+
       // check vsID portion of id
       {
-	char idstr[BUFSIZE];
-	bzero(idstr, BUFSIZE);
+	char idstr[1024];
+	bzero(idstr, 1024);
 	snprintf(idstr, strlen(((myv_message["id"]).asString()).c_str()) + 1,
 		 "%s", ((myv_message["id"]).asString()).c_str());
 
-	char c_prof_buf[BUFSIZE];
-	char c_post_buf[BUFSIZE];
-	bzero(c_prof_buf, BUFSIZE);
-	bzero(c_post_buf, BUFSIZE);
+	char c_prof_buf[256];
+	char c_post_buf[256];
+	bzero(c_prof_buf, 256);
+	bzero(c_post_buf, 256);
 	sscanf(idstr, "%[^_]_%s", c_prof_buf, c_post_buf);
 	std::string s_vsID { c_prof_buf };
       }
@@ -128,75 +151,63 @@ Myecs36bServer::update(const std::string& updating_json)
 
       Json::Value pjf_v;
       rc = myFile2JSON(fname_buf, &pjf_v);
-
+      
       if (rc != ECS36B_ERROR_NORMAL)
 	{
-#ifdef XYZ
 	  ei_ptr = new Exception_Info {};
 	  ei_ptr->where_code = ECS36B_ERROR_JSONRPC_SERVER;
 	  ei_ptr->which_string = "update File2JSON from file";
 	  ei_ptr->how_code = ECS36B_ERROR_NORMAL;
 	  ei_ptr->what_code = rc;
 	  (lv_exception_ptr->info_vector).push_back(ei_ptr);
-#endif /* XYZ */
 	}
       else
 	{
 	  try
 	    {
-	      // parsing the existing JSON Object copy, under ./posts/post...
-	      // printf("before Post::JSON2Object 01\n");
-	      // fflush(stdout);
 	      post_ptr->JSON2Object(&pjf_v);
-	      // printf("after  Post::JSON2Object 01\n");
-	      // fflush(stdout);
 	    }
 	  catch(ecs36b_Exception e)
 	    {
-	      // printf("after  Post::JSON2Object 02\n");
-	      // printf("so the saved copy trigger exceptions?");
-	      // fflush(stdout);
-	      
-	      JSON2Object_appendEI(e, lv_exception_ptr, 0);
-	      // printf("after  Post::JSON2Object 03\n");
-	      // fflush(stdout);
+	      int i;
+	      for (i = 0; i < (e.info_vector).size(); i++)
+		{
+		  Exception_Info * ei_ptr_copy = new Exception_Info {};
+		  (*ei_ptr_copy) = (*((e.info_vector)[i]));
+		  (lv_exception_ptr->info_vector).push_back(ei_ptr_copy);
+		}
+	      e.myDestructor();
 	    }
 	}
-
+      
       std::cout << (&myv_message) << std::endl;
-            
+      
       try
 	{
-	  // now the new object, perhaps merged
-	  // printf("before Post::JSON2Object 04\n");
-	  // fflush(stdout);
 	  post_ptr->JSON2Object(&myv_message);
-	  // printf("after  Post::JSON2Object 05\n");
-	  // fflush(stdout);
 	}
       catch(ecs36b_Exception e)
 	{
-	  // printf("after  Post::JSON2Object 06\n");
-	  // fflush(stdout);
-	  JSON2Object_appendEI(e, lv_exception_ptr, 0);
+	  int i;
+	  for (i = 0; i < (e.info_vector).size(); i++)
+	    {
+	      Exception_Info * ei_ptr_copy = new Exception_Info {};
+	      (*ei_ptr_copy) = (*((e.info_vector)[i]));
+	      (lv_exception_ptr->info_vector).push_back(ei_ptr_copy);
+	    }
+	  e.myDestructor();
 	}
-      
+
       // try to get the keys (to the key files)
       if (post_ptr->keys == NULL)
 	{
 	  post_ptr->keys = new vector<OKey *> ();
 	}
       
-      // printf("Here 1\n");
-      int ki;
-      for (ki = 0; ki < (post_ptr->keys)->size(); ki++)
+      int i;
+      for (i = 0; i < (post_ptr->keys)->size(); i++)
 	{
-	  // printf("Here 2\n");
-	  FILE *okey_f   = NULL;
-	  int found_flag = 0;
-	  int null_flag  = 1; // usually new okey
-
-	  OKey * okey_ptr = (*(post_ptr->keys))[ki];
+	  OKey * okey_ptr = (*(post_ptr->keys))[i];
 	  
 	  char fn_buf[256];
 	  bzero(fn_buf, 256);
@@ -207,19 +218,19 @@ Myecs36bServer::update(const std::string& updating_json)
 	  std::string target_buf = (post_ptr->id).get();
 	  // std::cout << target_buf << std::endl;
 
-	  // printf("Here 2.1\n");
+	  FILE *okey_f   = NULL;
+	  int found_flag = 0;
+	  int null_flag  = 1; // usually new okey
+
 	  okey_f = fopen(fn_buf, "r");
 
 	  if (okey_f != NULL)
 	    {
-	      // printf("Here 2.2\n");
 	      null_flag = 0;
 	      char post_id_buf[1024];
 	      int okey_loop_flag = 1;
 	      while (okey_loop_flag)
 		{
-		  // printf("Here 2.3\n");
-
 		  bzero(post_id_buf, 1024);
 		  int rc = fscanf(okey_f, "%[^\n]", post_id_buf);
 		  if (rc == EOF)
@@ -239,12 +250,9 @@ Myecs36bServer::update(const std::string& updating_json)
 		}
 	      fclose(okey_f);
 	    }
-	  // printf("Here 2.4\n");
 
 	  if ((null_flag == 1) || (found_flag == 0))
 	    {
-	      // printf("Here 2.5\n");
-
 	      FILE *okey_f = fopen(fn_buf, "a");
 	      if (okey_f != NULL)
 		{
@@ -256,30 +264,21 @@ Myecs36bServer::update(const std::string& updating_json)
 		  // throw...
 		  std::cout << "need to throw okey\n";
 		}
-	      // printf("Here 2.6\n");
 	    }
-	  // printf("Here 2.7\n");
 	}
 
-      // printf("Here 2.8\n");
       if ((lv_exception_ptr->info_vector).size() != 0)
 	{
-	  exception_count = (lv_exception_ptr->info_vector).size();
-	  std::cout << exception_count << std::endl;
-	  std::cout << *(lv_exception_ptr->dump2JSON()) << std::endl;
 	  throw (*lv_exception_ptr);
 	}
-      // printf("Here 2.85\n");
     }
   catch (ecs36b_Exception e)
     {
-      // printf("Here 2.9\n");
       int erc = produceErrorJSON(e, "ecs36bserver_update.log", &result_json, 0);
       if (erc != ECS36B_ERROR_NORMAL)
 	myPrintLog("{\"location\":\"produce Error catch\"}", "ecs36bserver_update.log");
     }
 
-  // printf("Here 2.10\n");
   // write it back
   // std::cout << fname_buf <<  std::endl;
   if (post_ptr == NULL)
@@ -288,20 +287,10 @@ Myecs36bServer::update(const std::string& updating_json)
       return result_json;
     }
   
-  // printf("Here 2.11 [%p]\n", post_ptr);
   Json::Value *rj_ptr = post_ptr->dump2JSON();
-  std::cout << exception_count << std::endl;
-  (*rj_ptr)["exception count"] = exception_count;
-  
-  std::cout << (*rj_ptr) << std::endl;
   delete post_ptr;
   
-  // printf("Here 2.12\n");
-
   rc = myJSON2File(fname_buf, rj_ptr);
-
-  // printf("Here 2.13\n");
-
   return (*rj_ptr);
 }
 
@@ -489,7 +478,14 @@ Myecs36bServer::search
 			    }
 			  catch(ecs36b_Exception e)
 			    {
-			      JSON2Object_appendEI(e, lv_exception_ptr, 0);
+			      int i;
+			      for (i = 0; i < (e.info_vector).size(); i++)
+				{
+				  Exception_Info * ei_ptr_copy = new Exception_Info {};
+				  (*ei_ptr_copy) = (*((e.info_vector)[i]));
+				  (lv_exception_ptr->info_vector).push_back(ei_ptr_copy);
+				}
+			      e.myDestructor();
 			    }
 			  // add to the result data
 			  json_data[post_count] = *(post_ptr->dump2JSON());
@@ -552,7 +548,14 @@ Myecs36bServer::search
 		    }
 		  catch(ecs36b_Exception e)
 		    {
-		      JSON2Object_appendEI(e, lv_exception_ptr, 0);
+		      int i;
+		      for (i = 0; i < (e.info_vector).size(); i++)
+			{
+			  Exception_Info * ei_ptr_copy = new Exception_Info {};
+			  (*ei_ptr_copy) = (*((e.info_vector)[i]));
+			  (lv_exception_ptr->info_vector).push_back(ei_ptr_copy);
+			}
+		      e.myDestructor();
 		    }
 		  // add to the result data
 		  json_data[post_count] = *(post_ptr->dump2JSON());
@@ -586,7 +589,7 @@ main(int argc, char *argv[])
 {
   if (argc != 1) exit(-1);
   // HttpServer httpserver(8384);
-  HttpServer httpserver(8300);
+  HttpServer httpserver(8384);
   // HttpServer httpserver(55408);
   Myecs36bServer s(httpserver,
 		JSONRPC_SERVER_V1V2); // hybrid server (json-rpc 1.0 & 2.0)

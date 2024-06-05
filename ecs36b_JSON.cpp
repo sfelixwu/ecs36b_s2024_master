@@ -68,7 +68,7 @@ JSON2Object_appendEI
       ei_ptr_copy->array_index = arg_index;
       (arg_exception_ptr->info_vector).push_back(ei_ptr_copy);
     }
-  arg_e.myDestructor();
+  // arg_e.myDestructor();
   return;
 }
 
@@ -84,8 +84,10 @@ myPrintLog
   JvTime *jv_ptr = getNowJvTime();
   std::string *str_ptr = jv_ptr->getTimeString();
   fprintf(log_f, "[%s] %s\n", str_ptr->c_str(), content.c_str());
+
   delete str_ptr;
   delete jv_ptr;
+  
   fflush(log_f);
   fclose(log_f);
   return;
@@ -132,7 +134,7 @@ myFile2String
   rewind(f_ptr);
 
   // allocate memory to contain the whole file:
-  char *result_ptr = (char *) malloc(sizeof(char)*lSize);
+  char *result_ptr = (char *) malloc(sizeof(char)*(lSize+1));
   // copy the file into the buffer:
   lresult = fread(result_ptr, 1, lSize, f_ptr);
   fclose(f_ptr);
@@ -154,9 +156,9 @@ myFile2JSON
   int rc;
 
   char *json_str = myFile2String(f_name);
-  // std::cout << f_name << std::endl;
-  // std::cout << ((void *) json_str) << std::endl;
-  // std::cout << jv_ptr << std::endl;
+  std::cout << f_name << std::endl;
+  std::cout << ((void *) json_str) << std::endl;
+  std::cout << jv_ptr << std::endl;
 
   if (json_str == NULL) rc = -1;
   else
@@ -646,9 +648,18 @@ bool
 Identifier::operator==
 (Identifier aIdentifier)
 {
-  return ((this->profile == aIdentifier.profile) &&
-	  (this->post    == aIdentifier.post)    &&
-	  (this->comment == aIdentifier.comment));
+  if ((this->comment == "") && (aIdentifier.comment == ""))
+    {
+      // this is probably unnecessary, but I am having a strange bug... :-(
+      return ((this->profile == aIdentifier.profile) &&
+	      (this->post    == aIdentifier.post));
+    }
+  else
+    {
+      return ((this->profile == aIdentifier.profile) &&
+	      (this->post    == aIdentifier.post)    &&
+	      (this->comment == aIdentifier.comment));
+    }
 }
 
 vector<std::string>

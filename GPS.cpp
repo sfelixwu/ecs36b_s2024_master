@@ -4,7 +4,6 @@
 GPS_DD::GPS_DD()
 {
   this->class_name = "GPS_DD";
-
   this->latitude = 0.0;
   this->longitude = 0.0;
 }
@@ -12,7 +11,6 @@ GPS_DD::GPS_DD()
 GPS_DD::GPS_DD(double arg_latitude, double arg_longitude)
 {
   this->class_name = "GPS_DD";
-
   this->latitude = arg_latitude;
   this->longitude = arg_longitude;
 }
@@ -166,7 +164,9 @@ GPS_DD::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  ecs36b_Exception *lv_exception_ptr = new ecs36b_Exception();
+  
+  ecs36b_Exception lv_exception {};
+  ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
   JSON2Object_precheck(arg_json_ptr, lv_exception_ptr,
 		       ECS36B_ERROR_JSON2OBJECT_GPS_DD);

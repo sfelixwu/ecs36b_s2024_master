@@ -5,6 +5,12 @@ Action::Action(void)
 {
   this->class_name = "Action";
   this->name = "";
+
+  // do we need this?
+  std::cout << "Action constructor called\n";
+  this->host_url = "";
+  this->object_id = "";
+  this->owner_vsID = "";
 }
 
 Action::Action(std::string core_arg_host_url,
@@ -29,6 +35,9 @@ Action::dump2JSON
 {
   Json::Value * result_ptr = this->Core::dump2JSON();
 
+  printf("Action dump2JSON from Core --\n");
+  std::cout << (*result_ptr) << std::endl;
+  
   if (this->name != "")
     {
       (*result_ptr)["name"] = this->name;
@@ -36,6 +45,7 @@ Action::dump2JSON
     }
   else
     {
+      if (result_ptr != NULL) delete result_ptr;
       return (Json::Value *) NULL;
     }
 }
@@ -45,45 +55,12 @@ Action::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  ecs36b_Exception * lv_exception_ptr = new ecs36b_Exception {};
+  
+  ecs36b_Exception lv_exception {};
+  ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
   JSON2Object_precheck(arg_json_ptr, lv_exception_ptr,
 		       ECS36B_ERROR_JSON2OBJECT_ACTION);
-
-  if (arg_json_ptr == ((Json::Value *) NULL))
-    {
-      ei_ptr = new Exception_Info {};
-      ei_ptr->where_code = ECS36B_ERROR_JSON2OBJECT_ACTION;
-      ei_ptr->which_string = "default";
-      ei_ptr->how_code = ECS36B_ERROR_NORMAL;
-      ei_ptr->what_code = ECS36B_ERROR_NULL_JSON_PTR;
-      ei_ptr->array_index = 0;
-      (lv_exception_ptr->info_vector).push_back(ei_ptr);
-      throw (*lv_exception_ptr);
-    }
-
-  if ((arg_json_ptr->isNull() == true) ||
-      (arg_json_ptr->isObject() != true))
-    {
-      ei_ptr = new Exception_Info {};
-      ei_ptr->where_code = ECS36B_ERROR_JSON2OBJECT_ACTION;
-      ei_ptr->which_string = "default";
-      ei_ptr->how_code = ECS36B_ERROR_NORMAL;
-
-      if (arg_json_ptr->isNull() == true)
-	{
-	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_MISSING;
-	}
-      else
-	{
-	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
-	}
-
-      ei_ptr->array_index = 0;
-
-      (lv_exception_ptr->info_vector).push_back(ei_ptr);
-      throw (*lv_exception_ptr);
-    }
 
   try
     {

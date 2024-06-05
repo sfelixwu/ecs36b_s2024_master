@@ -11,6 +11,7 @@ Core::Core
   class_name = "Core";
   object_id = "";
   owner_vsID = "";
+  std::cout << "Core constructor called\n";
 }
 
 Core::Core
@@ -43,6 +44,8 @@ Core::dump2JSON
     {
       (*result_ptr)["owner vsID"]  = this->owner_vsID;
     }
+  printf("Core::dump2JSON\n");
+  std::cout << (*result_ptr) << std::endl;
   return result_ptr;
 }
 
@@ -51,10 +54,14 @@ Core::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  ecs36b_Exception * lv_exception_ptr = new ecs36b_Exception {};
+  
+  ecs36b_Exception lv_exception {};
+  ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
   JSON2Object_precheck(arg_json_ptr, lv_exception_ptr,
 		       ECS36B_ERROR_JSON2OBJECT_CORE);
+
+  printf("Core::JSON2Object after pre-check\n");
   
   if (((*arg_json_ptr)["host url"].isNull() == true) ||
       ((*arg_json_ptr)["host url"].isString() == false))
@@ -162,6 +169,9 @@ Core::JSON2Object
 
   if ((lv_exception_ptr->info_vector).size() != 0)
     {
+      Json::Value *jv_ptr = lv_exception_ptr->dump2JSON();
+      std::cout << *(jv_ptr) << std::endl;
+      delete jv_ptr;
       throw (*lv_exception_ptr);
     }
   

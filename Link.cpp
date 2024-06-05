@@ -26,17 +26,19 @@ Json::Value *
 Link::dump2JSON
 (void)
 {
+  Json::Value * result_ptr = this->Core::dump2JSON();
+
+  printf("Action dump2JSON from Core --\n");
+  std::cout << (*result_ptr) << std::endl;
+  
   if (this->url != "")
     {
-      Json::Value *result_ptr = new Json::Value();
       (*result_ptr)["url"] = this->url;
-      (*result_ptr)["host url"] = this->host_url;
-      (*result_ptr)["class name"] = this->class_name;
-      (*result_ptr)["object id"] = this->object_id;
       return result_ptr;
     }
   else
     {
+      if (result_ptr != NULL) delete result_ptr;
       return (Json::Value *) NULL;
     }
 }
@@ -46,11 +48,22 @@ Link::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  ecs36b_Exception * lv_exception_ptr = new ecs36b_Exception {};
+  
+  ecs36b_Exception lv_exception {};
+  ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
   JSON2Object_precheck(arg_json_ptr, lv_exception_ptr,
 		       ECS36B_ERROR_JSON2OBJECT_LINK);
 
+  try
+    {
+      this->Core::JSON2Object(arg_json_ptr);
+    }
+  catch(ecs36b_Exception e)
+    {
+      JSON2Object_appendEI(e, lv_exception_ptr, 0);
+    }
+  
   if (((*arg_json_ptr)["url"].isNull() == true) ||
       ((*arg_json_ptr)["url"].isString() == false))
     {
@@ -72,75 +85,6 @@ Link::JSON2Object
   else
     {
       this->url = ((*arg_json_ptr)["url"]).asString();
-    }
-
-  if (((*arg_json_ptr)["host url"].isNull() == true) ||
-      ((*arg_json_ptr)["host url"].isString() == false))
-    {
-      ei_ptr = new Exception_Info {};
-      ei_ptr->where_code = ECS36B_ERROR_JSON2OBJECT_LINK;
-      ei_ptr->which_string = "host url";
-      ei_ptr->how_code = ECS36B_ERROR_NORMAL;
-
-      if ((*arg_json_ptr)["host url"].isNull() == true)
-	{
-	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_MISSING;
-	}
-      else
-	{
-	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
-	}
-      (lv_exception_ptr->info_vector).push_back(ei_ptr);
-    }
-  else
-    {
-      this->host_url = ((*arg_json_ptr)["host url"]).asString();
-    }
-
-  if (((*arg_json_ptr)["class name"].isNull() == true) ||
-      ((*arg_json_ptr)["class name"].isString() == false))
-    {
-      ei_ptr = new Exception_Info {};
-      ei_ptr->where_code = ECS36B_ERROR_JSON2OBJECT_LINK;
-      ei_ptr->which_string = "class name";
-      ei_ptr->how_code = ECS36B_ERROR_NORMAL;
-
-      if ((*arg_json_ptr)["class name"].isNull() == true)
-	{
-	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_MISSING;
-	}
-      else
-	{
-	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
-	}
-      (lv_exception_ptr->info_vector).push_back(ei_ptr);
-    }
-  else
-    {
-      this->class_name = ((*arg_json_ptr)["class name"]).asString();
-    }
-
-  if (((*arg_json_ptr)["object id"].isNull() == true) ||
-      ((*arg_json_ptr)["object id"].isString() == false))
-    {
-      ei_ptr = new Exception_Info {};
-      ei_ptr->where_code = ECS36B_ERROR_JSON2OBJECT_LINK;
-      ei_ptr->which_string = "object id";
-      ei_ptr->how_code = ECS36B_ERROR_NORMAL;
-
-      if ((*arg_json_ptr)["object id"].isNull() == true)
-	{
-	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_MISSING;
-	}
-      else
-	{
-	  ei_ptr->what_code = ECS36B_ERROR_JSON_KEY_TYPE_MISMATCHED;
-	}
-      (lv_exception_ptr->info_vector).push_back(ei_ptr);
-    }
-  else
-    {
-      this->object_id = ((*arg_json_ptr)["object id"]).asString();
     }
 
   if ((lv_exception_ptr->info_vector).size() != 0)

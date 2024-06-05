@@ -22,6 +22,8 @@ class Post : public Core
  private:
  protected:
  public:
+
+  Json::Value                  J2O_input; // for debugging
   Identifier                   id;
   Person                     * author;
   std::vector<Person      *> * receivers;

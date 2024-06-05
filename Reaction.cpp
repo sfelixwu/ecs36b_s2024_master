@@ -33,15 +33,18 @@ Reaction::operator==
 {
   bool brc = true;
 
+  printf("Reaction OL 1\n");
   if (((this->author) != NULL) && ((aReaction.author) != NULL))
     {
       brc = ((*(this->author)) == (*(aReaction.author)));
     }
 
+  printf("Reaction OL 2\n");
   if (((this->created) != NULL) && ((aReaction.created) != NULL))
     {
-      brc = (brc && ((*(this->author)) == (*(aReaction.author))));
+      brc = (brc && ((*(this->created)) == (*(aReaction.created))));
     }
+  printf("Reaction OL 3\n");
 
   return (brc && (this->type   == aReaction.type));
 }
@@ -71,7 +74,9 @@ Reaction::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  ecs36b_Exception * lv_exception_ptr = new ecs36b_Exception {};
+  
+  ecs36b_Exception lv_exception {};
+  ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
   JSON2Object_precheck(arg_json_ptr, lv_exception_ptr,
 		       ECS36B_ERROR_JSON2OBJECT_REACTION);

@@ -5,9 +5,8 @@ Post::Post
 (void)
 {
   this->class_name = "Post";
-
   this->author = NULL;
-  this->msg = NULL;
+  this->msg    = NULL;
 
   // very critical ==> portable to different platforms
   this->receivers = NULL;
@@ -46,10 +45,10 @@ Post::Post
 Post::~Post
 (void)
 {
-  if (this->author != NULL) delete this->author;
-  if (this->msg != NULL) delete this->msg;
-  if (this->created != NULL) delete this->created;
-  if (this->updated != NULL) delete this->updated;
+  if (this->author   != NULL) delete this->author;
+  if (this->msg      != NULL) delete this->msg;
+  if (this->created  != NULL) delete this->created;
+  if (this->updated  != NULL) delete this->updated;
   if (this->location != NULL) delete this->location;
 
   int i;
@@ -240,7 +239,9 @@ Post::dump2JSON
   // "message"
   if (this->msg != NULL)
     {
-      (*result_ptr)["message"] = (this->msg)->dump2JSON();
+      dumpjv_ptr = (this->msg)->dump2JSON();
+      (*result_ptr)["message"] = *(dumpjv_ptr);
+      delete dumpjv_ptr;
     }
 
   // "reactions"
@@ -300,24 +301,35 @@ Post::dump2JSON
   // "created"
   if (this->created != NULL)
     {
-      (*result_ptr)["created"] = *((this->created)->dump2JSON());
+      dumpjv_ptr = (this->created)->dump2JSON();
+      (*result_ptr)["created"] = *(dumpjv_ptr);
+      delete dumpjv_ptr;
     }
 
   // "updated"
   if (this->updated != NULL)
     {
-      (*result_ptr)["updated"] = *((this->updated)->dump2JSON());
+      dumpjv_ptr = (this->updated)->dump2JSON();
+      (*result_ptr)["updated"] = *(dumpjv_ptr);
+      delete dumpjv_ptr;
     }
 
   // "location"
   if (this->location != NULL)
     {
-      (*result_ptr)["location"] = *((this->location)->dump2JSON());
+      dumpjv_ptr = (this->location)->dump2JSON();
+      (*result_ptr)["location"] = *(dumpjv_ptr);
+      delete dumpjv_ptr;      
     }
 
   // "is published"
+  // std::cout << (*result_ptr)["is published"] << std::endl;
   (*result_ptr)["is published"] = this->is_published;
+  // std::cout << (*result_ptr)["is published"] << std::endl;
 
+  // "JSON2Object"
+  (*result_ptr)["JSON2Object"] = this->J2O_input;
+  
   return result_ptr;
 }
 
@@ -409,11 +421,17 @@ Post::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  ecs36b_Exception * lv_exception_ptr = new ecs36b_Exception {};
+  
+  ecs36b_Exception lv_exception {};
+  ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
   JSON2Object_precheck(arg_json_ptr, lv_exception_ptr,
 		       ECS36B_ERROR_JSON2OBJECT_POST);
 
+  // the following line is ONLY for Post.cpp. We keep a copy of the incoming JSON.
+  // for debugging
+  this->J2O_input = (*arg_json_ptr);
+  
   // "id"
   if ((((*arg_json_ptr)["id"]).isNull() == true) ||
       (((*arg_json_ptr)["id"]).isString() == false) ||
@@ -549,7 +567,6 @@ Post::JSON2Object
 	    }
 
 	  ei_ptr->array_index = 0;
-
 	  (lv_exception_ptr->info_vector).push_back(ei_ptr);
 	}
       else
@@ -562,39 +579,55 @@ Post::JSON2Object
 	  int ai;
 	  for (ai = 0; ai < ((*arg_json_ptr)["to"]["data"]).size(); ai++)
 	    {
+	      // printf("ai array index [%d] \n", ai);
 	      Json::Value l_jv_to = (*arg_json_ptr)["to"]["data"][ai];
 	      Person *l_to_ptr = new Person();
+
+	      // printf("Heremymy 00 %p %d\n", l_to_ptr, ai);
 	      try
 		{
 		  l_to_ptr->JSON2Object(&(l_jv_to));
 		}
 	      catch(ecs36b_Exception e)
 		{
+		  // printf("I should NOT be here\n");
 		  JSON2Object_appendEI(e, lv_exception_ptr, ai);
 		}
 
 	      // now check if the receiver already exist
 	      int flag_rr = 0;
+	      // int my_i2 = 0;
 	      vector<Person *>::iterator my_it_rr;
 	      for (my_it_rr = (*(this->receivers)).begin();
 		   my_it_rr < (*(this->receivers)).end(); my_it_rr++)
 		{
+		  // printf("my array index [%d] \n", my_i2);
+		  // my_i2++;
+		  
 		  // within a given post, each person should only receive once
 		  // operator== for Person
+		  // printf("Heremymy 111 %p %p\n", (*my_it_rr), l_to_ptr);
 		  if ((*(*my_it_rr)) == (*(l_to_ptr)))
 		    {
 		      // this is a duplicated reaction as one person can only have one reaction
 		      flag_rr = 1;
+		      // printf("Same Person again %p [%d] %p\n", (*my_it_rr), ai, l_to_ptr);
 		    }
 		}
 
 	      if (flag_rr == 0)
 		{
+		  // printf("Why am I here? %p\n", l_to_ptr);
 		  (*(this->receivers)).push_back(l_to_ptr);
 		}
 	      else
 		{
-		  delete l_to_ptr;
+		  // same person so I need to FREE
+		  // printf("Same Person need to be freed %p [%d] %p\n", (*my_it_rr), ai, l_to_ptr);
+		  // printf("Heremymy 223 %p\n", l_to_ptr);
+		  // strange bugGGGG
+		  
+		  // delete l_to_ptr;
 		}
 	    }
 	}
@@ -642,6 +675,7 @@ Post::JSON2Object
   if ((((*arg_json_ptr)["keys"]).isNull() == true) ||
       (((*arg_json_ptr)["keys"]).isObject() != true))
     {
+      // printf("Post Here -1\n");
       ei_ptr = new Exception_Info {};
       ei_ptr->where_code = ECS36B_ERROR_JSON2OBJECT_POST;
       ei_ptr->which_string = "keys";
@@ -662,9 +696,12 @@ Post::JSON2Object
     }
   else
     {
+      // printf("Post Here -2\n");
       if ((((*arg_json_ptr)["keys"]["data"]).isNull() == true) ||
 	  (((*arg_json_ptr)["keys"]["data"]).isArray() != true))
 	{
+	  // printf("Post Here -3\n");
+
 	  ei_ptr = new Exception_Info {};
 	  ei_ptr->where_code = ECS36B_ERROR_JSON2OBJECT_POST;
 	  ei_ptr->which_string = "keys::data";
@@ -685,6 +722,7 @@ Post::JSON2Object
 	}
       else
 	{
+	  // printf("Post Here 1\n");
 	  if (this->keys == NULL)
 	    {
 	      this->keys = new vector<OKey *>();
@@ -693,10 +731,18 @@ Post::JSON2Object
 	  int ai;
 	  for (ai = 0; ai < ((*arg_json_ptr)["keys"]["data"]).size(); ai++)
 	    {
+	      // fflush(stdout);
+	      // printf("Post Here 2 [%d, %p]\n", ai, arg_json_ptr);
+	      // fflush(stdout);
 	      Json::Value l_jv_key = (*arg_json_ptr)["keys"]["data"][ai];
+	      // fflush(stdout);
+	      // printf("Post Here 2.1\n");
+
 	      OKey * l_key_ptr = new OKey();
+	      // printf("Post Here 2.2\n");
 	      try
 		{
+		  // printf("Post Here 3\n");
 		  l_key_ptr->JSON2Object(&(l_jv_key));
 		}
 	      catch(ecs36b_Exception e)
@@ -707,9 +753,11 @@ Post::JSON2Object
 	      // now check if the key already exist
 	      int flag_ky = 0;
 	      vector<OKey *>::iterator my_it_ky;
+	      // printf("Post Here 4\n");
 	      for (my_it_ky = (*(this->keys)).begin();
 		   my_it_ky < (*(this->keys)).end(); my_it_ky++)
 		{
+		  // printf("Post Here 5\n");
 		  // operator== for OKey
 		  if ((*(*my_it_ky)) == (*(l_key_ptr)))
 		    {
@@ -717,17 +765,22 @@ Post::JSON2Object
 		    }
 		}
 
+	      // printf("Post Here 6\n");
 	      if (flag_ky == 0)
 		{
+		  // printf("Post Here 7\n");
+
 		  (*(this->keys)).push_back(l_key_ptr);
 		}
 	      else
 		{
+		  // printf("Post Here 8\n");
 		  delete l_key_ptr;
 		}
 	    }
 	}
     }
+  // printf("Post Here 9\n");
 
   // "actions"
   if ((((*arg_json_ptr)["actions"]).isNull() == true) ||
@@ -820,6 +873,7 @@ Post::JSON2Object
 	}
     }
 
+  // printf("Post Here 10\n");
   // "comments"
   if ((((*arg_json_ptr)["comments"]).isNull() == true) ||
       (((*arg_json_ptr)["comments"]).isObject() != true))
@@ -839,8 +893,10 @@ Post::JSON2Object
 	}
 
       ei_ptr->array_index = 0;
-      
-      (lv_exception_ptr->info_vector).push_back(ei_ptr);
+
+      // No comment should be fine so no exception raised
+      // (lv_exception_ptr->info_vector).push_back(ei_ptr);
+      delete ei_ptr;
     }
   else
     {
@@ -872,13 +928,17 @@ Post::JSON2Object
 	      this->comments = new vector<Comment *>();
 	    }
 
+	  // printf("Post Here 10 1\n");
+
 	  int ai;
 	  for (ai = 0; ai < ((*arg_json_ptr)["comments"]["data"]).size(); ai++)
 	    {
+	      // printf("Post Here 10 2\n");
 	      Json::Value l_jv_comment = (*arg_json_ptr)["comments"]["data"][ai];
 	      Comment *l_comment_ptr = new Comment();
 	      try
 		{
+		  // printf("Post Here 10 3\n");
 		  l_comment_ptr->JSON2Object(&(l_jv_comment));
 		}
 	      catch(ecs36b_Exception e)
@@ -886,12 +946,15 @@ Post::JSON2Object
 		  JSON2Object_appendEI(e, lv_exception_ptr, ai);
 		}
 
+	      // printf("Post Here 10 4\n");
+
 	      // now check if the comment already exist
 	      int flag_co = 0;
 	      vector<Comment *>::iterator my_it_co;
 	      for (my_it_co = (*(this->comments)).begin();
 		   my_it_co < (*(this->comments)).end(); my_it_co++)
 		{
+		  // printf("Post Here 10 5\n");
 		  // Comment operator==
 		  if ((*(*my_it_co)) == (*(l_comment_ptr)))
 		    {
@@ -899,18 +962,22 @@ Post::JSON2Object
 		    }
 		}
 
+	      // printf("Post Here 10 6\n");
 	      if (flag_co == 0)
 		{
+		  // printf("Post Here 10 7\n");
 		  (*(this->comments)).push_back(l_comment_ptr);
 		}
 	      else
 		{
+		  // printf("Post Here 10 8\n");
 		  delete l_comment_ptr;
 		}
 	    }
 	}
     }
 
+  // printf("Post Here 11\n");
   // "links"
   if ((((*arg_json_ptr)["links"]).isNull() == true) ||
       (((*arg_json_ptr)["links"]).isObject() != true))
@@ -1003,6 +1070,7 @@ Post::JSON2Object
 	}
     }
 
+  // printf("Post Here 12\n");
   // "reactions"
   if ((((*arg_json_ptr)["reactions"]).isNull() == true) ||
       (((*arg_json_ptr)["reactions"]).isObject() != true))
@@ -1023,7 +1091,9 @@ Post::JSON2Object
 
       ei_ptr->array_index = 0;
       
-      (lv_exception_ptr->info_vector).push_back(ei_ptr);
+      // No reactions should be fine so no exception raised
+      // (lv_exception_ptr->info_vector).push_back(ei_ptr);
+      delete ei_ptr;
     }
   else
     {
@@ -1097,6 +1167,7 @@ Post::JSON2Object
 	}
     }
 
+  // printf("Post Here 13\n");
   // "created"
   if (((*arg_json_ptr)["created"].isNull() == true) ||
       ((*arg_json_ptr)["created"].isObject() == false))
@@ -1134,7 +1205,9 @@ Post::JSON2Object
 	  JSON2Object_appendEI(e, lv_exception_ptr, 0);
 	}
     }
-  
+
+  // printf("Post Here 14\n");
+
   // "updated"
   if (((*arg_json_ptr)["updated"].isNull() == true) ||
       ((*arg_json_ptr)["updated"].isObject() == false))
@@ -1173,6 +1246,7 @@ Post::JSON2Object
 	}
     }
 
+  // printf("Post Here 15\n");
   // "location"
   if (((*arg_json_ptr)["location"].isNull() == true) ||
       ((*arg_json_ptr)["location"].isObject() == false))
@@ -1211,6 +1285,7 @@ Post::JSON2Object
 	}
     }
 
+  // printf("Post Here 16\n");
   // "is published"
   if (((*arg_json_ptr)["is published"].isNull() == true) ||
       ((*arg_json_ptr)["is published"].isBool() == false))
@@ -1235,13 +1310,19 @@ Post::JSON2Object
     }
   else
     {
-      this->is_published = ((*arg_json_ptr)["is_published"]).asBool();
+      this->is_published = ((*arg_json_ptr)["is published"]).asBool();
     }
 
+  // printf("Post Here 17\n");
+  // fflush(stdout);
+  
   if ((lv_exception_ptr->info_vector).size() != 0)
     {
       throw (*lv_exception_ptr);
     }
+
+  // printf("Post Here 18\n");
+  // fflush(stdout);
 
   return;
 }
