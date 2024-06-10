@@ -78,7 +78,7 @@ Person::operator==
 // (Person& aPerson)
 // (Person * aPerson)
 {
-  printf("MMMMMM Person::operator==\n");
+  // printf("MMMMMM Person::operator==\n");
   return (this->vsID == aPerson.getvsID());
 
   // return ((this->vsID == aPerson.getvsID()) &&
