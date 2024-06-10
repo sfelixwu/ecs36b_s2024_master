@@ -78,6 +78,7 @@ Myecs36bServer::update(const std::string& updating_json)
 	  throw (*lv_exception_ptr);
 	}
 
+      // printf("server Here 1\n");
       rc = myParseJSON(updating_json, &myv_message);
       if (rc != ECS36B_ERROR_NORMAL)
 	{
@@ -127,10 +128,13 @@ Myecs36bServer::update(const std::string& updating_json)
 	std::string s_vsID { c_prof_buf };
       }
 
+      // printf("server Here 2\n");
       post_ptr = new Post((Person *) NULL, (Message *) NULL);
 
       Json::Value pjf_v;
       rc = myFile2JSON(fname_buf, &pjf_v);
+
+      // printf("server Here 3\n");
 
       if ((rc != ECS36B_ERROR_NORMAL) &&
 	  (rc != ECS36B_ERROR_FILE_NOT_EXIST))
@@ -148,10 +152,13 @@ Myecs36bServer::update(const std::string& updating_json)
 	  try
 	    {
 	      // parsing the existing JSON Object copy, under ./posts/post...
+	      // printf("server Here 4\n");
 	      post_ptr->JSON2Object(&pjf_v);
+	      // printf("server Here 5\n");
 	    }
 	  catch(ecs36b_Exception& e)
 	    {
+	      // printf("server Here 6\n");
 	      JSON2Object_appendEI(e, lv_exception_ptr, 0);
 	    }
 	}
@@ -426,6 +433,8 @@ Myecs36bServer::search
 	  snprintf(fn_buf, strlen("./okeys/okey_.list") + strlen(cbuf) + 1,
 		   "./okeys/okey_%s.list", cbuf);
 
+	  printf("Keyword file is [%s]\n", fn_buf);
+	  
 	  std::string s = fn_buf;
 	  myPrintLog(s, "ecs36bserver_search.log");
 
@@ -488,16 +497,20 @@ Myecs36bServer::search
 			      JSON2Object_appendEI(e, lv_exception_ptr, 0);
 			    }
 			  // add to the result data
-			  json_data[post_count] = *(post_ptr->dump2JSON());
-			  post_count++;
-			  delete post_ptr;
+			  Json::Value *jv_post_ptr = post_ptr->dump2JSON();
+			  if (jv_post_ptr != NULL)
+			    {
+			      json_data[post_count] = *(jv_post_ptr);
+			      post_count++;
+			      delete jv_post_ptr;
+			      delete post_ptr;
+			    }
 			}
 		    }
 		}
 	      fgetc(okey_f);
 	    }
 	  fclose(okey_f);
-
 	  result_json["data"]  = json_data;
 	  result_json["court"] = post_count;
 	}
@@ -515,6 +528,8 @@ Myecs36bServer::search
 	      throw (*lv_exception_ptr);
 	    }
 
+	  printf("searching id [%s]\n", ((myv_message["id"]).asString()).c_str());
+	  
 	  // extracting the "id" object
 	  vector<std::string> matched = matchDirent("posts/.", "post",
 						    (myv_message["id"]).asString());
@@ -524,6 +539,9 @@ Myecs36bServer::search
 	    {
 	      char pfn_buf[1024];
 	      bzero(pfn_buf, 1024);
+	      printf("[%d] = %s\n", j, (matched[j]).c_str());
+	      fflush(stdout);
+	      
 	      snprintf(pfn_buf, strlen("./posts/") + strlen((matched[j]).c_str()) + 1,
 		       "./posts/%s", (matched[j]).c_str());
 	      std::cout << pfn_buf << std::endl;
@@ -551,9 +569,14 @@ Myecs36bServer::search
 		      JSON2Object_appendEI(e, lv_exception_ptr, 0);
 		    }
 		  // add to the result data
-		  json_data[post_count] = *(post_ptr->dump2JSON());
-		  post_count++;
-		  delete post_ptr;
+		  Json::Value *jv_post_ptr = post_ptr->dump2JSON();
+		  if (jv_post_ptr != NULL)
+		    {
+		      json_data[post_count] = *(jv_post_ptr);
+		      post_count++;
+		      delete jv_post_ptr;
+		      delete post_ptr;
+		    }
 		}
 	    }
 

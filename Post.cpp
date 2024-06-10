@@ -510,6 +510,7 @@ Post::JSON2Object
 	}
     }
 
+  // printf("Post Here -7\n");
   // "from"
   if (((*arg_json_ptr)["from"].isNull() == true) ||
       ((*arg_json_ptr)["from"].isObject() == false))
@@ -550,10 +551,12 @@ Post::JSON2Object
       jvp = (this->author)->dump2JSON();
       if (jvp != NULL)
 	{
-	  std::cout << (*jvp) << std::endl;
+	  // std::cout << (*jvp) << std::endl;
+	  delete jvp;
 	}
     }
 
+  // printf("Post Here -6\n");
   // "to"
   if ((((*arg_json_ptr)["to"]).isNull() == true) ||
       (((*arg_json_ptr)["to"]).isObject() != true))
@@ -600,6 +603,8 @@ Post::JSON2Object
 	}
       else
 	{
+	  // printf("processing to::data\n");
+	  
 	  if (this->receivers == NULL)
 	    {
 	      this->receivers = new vector<Person *>();
@@ -624,12 +629,17 @@ Post::JSON2Object
 		}
 	      
 	      Json::Value *jvp = NULL;
-	      jvp = (this->author)->dump2JSON();
-	      if (jvp != NULL)
+	      if (l_to_ptr != NULL)
 		{
-		  std::cout << (*jvp) << std::endl;
+		  jvp = l_to_ptr->dump2JSON();
+		  if (jvp != NULL)
+		    {
+		      // std::cout << (*jvp) << std::endl;
+		      delete jvp;
+		    }
 		}
 
+	      // printf("processing to::data point 2\n");
 	      // now check if the receiver already exist
 	      int flag_rr = 0;
 	      // int my_i2 = 0;
@@ -673,6 +683,7 @@ Post::JSON2Object
 	}
     }
 
+  // printf("Post Here -5\n");
   // "message"
   if (((*arg_json_ptr)["message"].isNull() == true) ||
       ((*arg_json_ptr)["message"].isObject() == false))
@@ -711,6 +722,7 @@ Post::JSON2Object
 	}
     }
 
+  // printf("Post Here -4\n");
   // "keys"
   if ((((*arg_json_ptr)["keys"]).isNull() == true) ||
       (((*arg_json_ptr)["keys"]).isObject() != true))

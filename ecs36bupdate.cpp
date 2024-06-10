@@ -119,15 +119,17 @@ main
 
   Exception_Info * ei_ptr = NULL;
   ecs36b_Exception * lv_exception_ptr = new ecs36b_Exception {};
-
+  
   Post * post_ptr = new Post((Person *) NULL, (Message *) NULL);
   try
     {
+      printf("update Here 1\n");
       post_ptr->JSON2Object(&jv);
+      printf("update Here 2\n");
     }
   catch(ecs36b_Exception& e)
     {
-      // std::cout << "post JSON2Object exception\n";
+      std::cout << "post JSON2Object exception\n";
       JSON2Object_appendEI(e, lv_exception_ptr, 0);
     }
 
