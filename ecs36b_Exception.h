@@ -15,6 +15,7 @@ public:
   std::string which_string;
   int how_code;
   unsigned int array_index;
+
   Exception_Info() { array_index = 0; }
   Exception_Info& operator=(Exception_Info& aExceptionInfo)
   {

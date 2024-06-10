@@ -19,7 +19,7 @@ class OKey : public Core
   OKey()                     { this->okey = "";       this->posts = NULL; }
   OKey(std::string arg_okey) { this->okey = arg_okey; this->posts = NULL; }
 
-  bool operator==(OKey);
+  bool operator==(OKey&);
 
   virtual Json::Value * dump2JSON(void);
   virtual void JSON2Object(Json::Value *);

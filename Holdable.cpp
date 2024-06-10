@@ -11,6 +11,8 @@ Holdable::Holdable
 Holdable::~Holdable
 (void)
 {
+  // return;
+  
   if (this->holder != (Person *) NULL)
     {
       delete this->holder;
@@ -19,11 +21,11 @@ Holdable::~Holdable
 
 bool
 Holdable::operator==
-(Holdable another)
+(Holdable& another)
 {
-  std::cout << "Holdable::operator == was called\n";
-  return ((*(this->holder) == *(another.holder)) &&
-	  (((Locatable) (*this)) == ((Locatable) another)));
+  // std::cout << "Holdable::operator == was called\n";
+  return ((*(this->holder)       == *(another.holder)) &&
+	  (((Locatable) (*this)) == ((Locatable&) another)));
 }
 
 Json::Value *
@@ -31,14 +33,31 @@ Holdable::dump2JSON
 (void)
 {
   Json::Value * result_ptr = this->Locatable::dump2JSON();
+  Json::Value * jv_ptr     = NULL;
+  
+  if ((result_ptr == NULL) && (this->holder == NULL))
+    {
+      return NULL;
+    }
 
   if (result_ptr == NULL)
     {
       result_ptr = new Json::Value();
     }
   
-  if (this->holder != NULL) 
-    (*result_ptr)["holder"] = *((this->holder)->dump2JSON());
+  if (this->holder != NULL)
+    {
+      jv_ptr = (this->holder)->dump2JSON();
+      if (jv_ptr != NULL)
+	{
+	  (*result_ptr)["holder"] = *(jv_ptr);
+	}
+      else
+	{
+	  delete result_ptr;
+	  return NULL;
+	}
+    }
   
   return result_ptr;
 }
@@ -48,7 +67,6 @@ Holdable::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  
   ecs36b_Exception lv_exception {};
   ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
@@ -94,7 +112,7 @@ Holdable::JSON2Object
     {
       this->Locatable::JSON2Object(arg_json_ptr);
     }
-  catch(ecs36b_Exception e)
+  catch(ecs36b_Exception& e)
     {
       JSON2Object_appendEI(e, lv_exception_ptr, 0);
     }
@@ -130,7 +148,7 @@ Holdable::JSON2Object
 	    }
 	  (this->holder)->JSON2Object(&((*arg_json_ptr)["holder"]));
 	}
-      catch(ecs36b_Exception e)
+      catch(ecs36b_Exception& e)
 	{
 	  JSON2Object_appendEI(e, lv_exception_ptr, 0);
 	}

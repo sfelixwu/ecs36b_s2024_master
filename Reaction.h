@@ -20,7 +20,7 @@ class Reaction : public Core
   ~Reaction();
   Reaction(std::string arg_type, Person * arg_author, JvTime * arg_created);
   
-  bool operator==(Reaction aReaction);
+  bool operator==(Reaction& aReaction);
 
   virtual Json::Value * dump2JSON(void);
   virtual void JSON2Object(Json::Value *);

@@ -78,7 +78,7 @@ public:
   int setPP(std::string);
   int setPPC(std::string);
   
-  bool operator==(Identifier aIdentifier);
+  bool operator==(Identifier& aIdentifier);
 };
 
 // error code

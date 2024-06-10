@@ -17,7 +17,7 @@ Link::Link
 
 bool
 Link::operator==
-(Link aLink)
+(Link& aLink)
 {
   return (this->url == aLink.url);
 }
@@ -28,8 +28,22 @@ Link::dump2JSON
 {
   Json::Value * result_ptr = this->Core::dump2JSON();
 
-  printf("Action dump2JSON from Core --\n");
-  std::cout << (*result_ptr) << std::endl;
+  if (result_ptr != NULL)
+    {
+      // printf("Link dump2JSON from Core --\n");
+      // std::cout << (*result_ptr) << std::endl;
+    }
+  else
+    {
+      if (this->url != "")
+	{
+	  result_ptr = new Json::Value ();
+	}
+      else
+	{
+	  return NULL;
+	}
+    }
   
   if (this->url != "")
     {
@@ -48,7 +62,6 @@ Link::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  
   ecs36b_Exception lv_exception {};
   ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
@@ -59,7 +72,7 @@ Link::JSON2Object
     {
       this->Core::JSON2Object(arg_json_ptr);
     }
-  catch(ecs36b_Exception e)
+  catch(ecs36b_Exception& e)
     {
       JSON2Object_appendEI(e, lv_exception_ptr, 0);
     }

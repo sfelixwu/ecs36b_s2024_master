@@ -3,7 +3,7 @@
 
 bool
 OKey::operator==
-(OKey aOKey)
+(OKey& aOKey)
 {
   return (this->okey == aOKey.okey);
 }
@@ -12,10 +12,11 @@ Json::Value *
 OKey::dump2JSON
 (void)
 {
-  Json::Value * result_ptr = new Json::Value();
+  Json::Value * result_ptr = NULL;
 
   if (this->okey != "")
     {
+      result_ptr = new Json::Value();
       (*result_ptr)["key"] = this->okey;
       return result_ptr;
     }
@@ -29,8 +30,7 @@ void
 OKey::JSON2Object
 (Json::Value * arg_json_ptr)
 {
-  Exception_Info * ei_ptr = NULL;
-  
+  Exception_Info * ei_ptr = NULL;  
   ecs36b_Exception lv_exception {};
   ecs36b_Exception * lv_exception_ptr = &lv_exception;
 

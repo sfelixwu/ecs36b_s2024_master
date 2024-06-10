@@ -5,7 +5,6 @@ Labeled_GPS::Labeled_GPS
 ()
 {
   this->class_name = "Labeled_GPS";
-
   this->label = "default";
 }
 
@@ -14,7 +13,6 @@ Labeled_GPS::Labeled_GPS
   : GPS_DD(arg_latitude, arg_longitude)
 {
   this->class_name = "Labeled_GPS";
-
   this->label = arg_label;
 }
 
@@ -28,7 +26,7 @@ Labeled_GPS::setGPSLabel
 
 bool
 Labeled_GPS::operator==
-(Labeled_GPS another)
+(Labeled_GPS& another)
 {
   return((this->latitude == another.getLatitude()) &&
 	 (this->longitude == another.getLongitude()) &&
@@ -47,6 +45,7 @@ Labeled_GPS::dump2JSON
 
   // option #2
   // force the compiler to link to the parent version of dump2JSON()
+  
   Json::Value * result_ptr = this->GPS_DD::dump2JSON();
   if (result_ptr == NULL) return NULL;
   
@@ -68,7 +67,6 @@ Labeled_GPS::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  
   ecs36b_Exception lv_exception {};
   ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
@@ -77,10 +75,11 @@ Labeled_GPS::JSON2Object
 
   try
     {
+      // recursion infinitely if --
       // segmentation fault: this->JSON2Object(arg_json_ptr);
       this->GPS_DD::JSON2Object(arg_json_ptr);
     }
-  catch(ecs36b_Exception e)
+  catch(ecs36b_Exception& e)
     {
       JSON2Object_appendEI(e, lv_exception_ptr, 0);
     }

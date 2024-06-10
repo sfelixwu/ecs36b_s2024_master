@@ -121,15 +121,15 @@ GPS_DD::distance
 
 bool
 GPS_DD::operator==
-(GPS_DD another)
+(GPS_DD& another)
 {
-  return((this->latitude == another.getLatitude()) &&
+  return((this->latitude  == another.getLatitude())   &&
 	 (this->longitude == another.getLongitude()));
 }
 
 bool
 GPS_DD::operator<
-(GPS_DD another)
+(GPS_DD& another)
 {
   if (this->latitude < another.getLatitude()) return true;
 
@@ -144,17 +144,11 @@ Json::Value *
 GPS_DD::dump2JSON
 (void)
 {
+  // printf("GPS_DD dump2JSON start\n");
   Json::Value * result_ptr = new Json::Value();
-  
-  if (this->latitude != 0.0)
-    {
-      (*result_ptr)["latitude"] = this->latitude;
-    }
 
-  if (this->longitude != 0.0)
-    {
-      (*result_ptr)["longitude"] = this->longitude;
-    }
+  (*result_ptr)["latitude"]  = this->latitude;
+  (*result_ptr)["longitude"] = this->longitude;
 
   return result_ptr;
 }
@@ -164,7 +158,6 @@ GPS_DD::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  
   ecs36b_Exception lv_exception {};
   ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
@@ -195,6 +188,10 @@ GPS_DD::JSON2Object
   else
     {
       this->latitude = ((*arg_json_ptr)["latitude"]).asDouble();
+      if (((this->latitude) > 90.0) || ((this->latitude) < -90.0))
+	{
+	  this->latitude = 0.0; 
+	}
     }
 
   if ((((*arg_json_ptr)["longitude"]).isNull() == true) ||
@@ -221,6 +218,10 @@ GPS_DD::JSON2Object
   else
     {
       this->longitude = ((*arg_json_ptr)["longitude"]).asDouble();
+      if (((this->longitude) > 180.0) || ((this->longitude) < -180.0))
+	{
+	  this->longitude = 0.0; 
+	}
     }
 
   if ((lv_exception_ptr->info_vector).size() != 0)

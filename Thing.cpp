@@ -13,7 +13,7 @@ Thing::Thing
 
 bool
 Thing::operator==
-(Thing another)
+(Thing& another)
 {
   // std::cout << "Thing::operator == was called\n";
   return ((this->sequence_num == another.sequence_num) &&
@@ -27,7 +27,25 @@ Thing::dump2JSON
 ()
 {
   Json::Value * result_ptr = this->Core::dump2JSON();
-  
+  Json::Value * jv_ptr = NULL;
+
+  if (result_ptr != NULL)
+    {
+      printf("Thing dump2JSON from Core --\n");
+      std::cout << (*result_ptr) << std::endl;
+    }
+  else
+    {
+      if (this->sequence_num != 0)
+	{
+	  result_ptr = new Json::Value ();
+	}
+      else
+	{
+	  return NULL;
+	}
+    }
+
   if (this->sequence_num != 0)
     {
       (*result_ptr)["sequence num"] = this->sequence_num;

@@ -88,7 +88,7 @@ Timed_Location::Timed_Location
 
 bool
 Timed_Location::operator==
-(Timed_Location another)
+(Timed_Location& another)
 {
   return ((this->time == another.time) &&
 	  (this->location == another.location));
@@ -96,14 +96,14 @@ Timed_Location::operator==
 
 bool
 Timed_Location::operator!=
-(Timed_Location another)
+(Timed_Location& another)
 {
   return !((*this) == another);
 }
 
 bool
 Timed_Location::operator<
-(Timed_Location another)
+(Timed_Location& another)
 {
   if (this->time < another.time) return true;
 
@@ -116,7 +116,7 @@ Timed_Location::operator<
 
 bool
 Timed_Location::operator>
-(Timed_Location another)
+(Timed_Location& another)
 {
   return (((*this) != another) &&
 	  (!((*this) < another)));
@@ -127,8 +127,22 @@ Timed_Location::dump2JSON
 (void)
 {
   Json::Value * result_ptr = new Json::Value();
-  (*result_ptr)["location"] = *((this->location).dump2JSON());
-  (*result_ptr)["time"]     = *((this->time).dump2JSON());
+  Json::Value * jv_ptr = NULL;
+
+  jv_ptr = (this->location).dump2JSON();
+  if (jv_ptr != NULL)
+    {
+      (*result_ptr)["location"] = (*jv_ptr);
+      delete jv_ptr;
+    }
+
+  jv_ptr = (this->time).dump2JSON();
+  if (jv_ptr != NULL)
+    {
+      (*result_ptr)["time"]     = (*jv_ptr);
+      delete jv_ptr;
+    }
+  
   // {"location": {}, "time": {}}
   // {"location": {"latitude": 1.0, "logitude": -2.1}, "time": {"time": "..."}}
   // values: string, number, true, false, null, {}, []
@@ -139,8 +153,7 @@ void
 Timed_Location::JSON2Object
 (Json::Value * arg_json_ptr)
 {
-  Exception_Info * ei_ptr = NULL;
-  
+  Exception_Info * ei_ptr = NULL;  
   ecs36b_Exception lv_exception {};
   ecs36b_Exception * lv_exception_ptr = &lv_exception;
 

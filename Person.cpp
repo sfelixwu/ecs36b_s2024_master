@@ -29,8 +29,17 @@ Person::Person()
 
 Person::~Person()
 {
+  // return;
   if (this->home != NULL)
     {
+      // printf("destruct home = %p\n", this->home);
+      // Json::Value *jp = (this->home)->dump2JSON();
+      // if (jp != NULL)
+      //	{
+      //	  std::cout << (*jp) << std::endl;
+      //  printf("jp = %p\n", jp);
+      //  delete jp;
+      //}
       delete this->home;
     }
 }
@@ -65,11 +74,11 @@ Person::getName()
 // function prototype
 bool
 Person::operator==
-(Person aPerson)
+(Person& aPerson)
 // (Person& aPerson)
 // (Person * aPerson)
 {
-  printf("Person::operator==\n");
+  printf("MMMMMM Person::operator==\n");
   return (this->vsID == aPerson.getvsID());
 
   // return ((this->vsID == aPerson.getvsID()) &&
@@ -80,26 +89,47 @@ Json::Value *
 Person::dump2JSON
 ()
 {
-  Json::Value * result_ptr = new Json::Value();
+  // printf("Person dump2JSON start\n");
+
+  if ((this->name == "") &&
+      (this->vsID == "") &&
+      (this->home == NULL))
+    {
+      // printf("Person dump2JSON start empty here\n");
+      return NULL;
+    }
   
+  Json::Value * result_ptr = new Json::Value();
+
+  // printf("Person dump2JSON name\n");
   if (this->name != "")
     {
       (*result_ptr)["name"] = this->name;
     }
 
+  // printf("Person dump2JSON vsID\n");
   if (this->vsID != "")
     {
       (*result_ptr)["vsID"] = this->vsID;
     }
 
+  // printf("Person dump2JSON home %p\n", this->home);
   if (this->home != NULL)
     {
+      // fflush(stdout);
+      // printf("Person dump2JSON home 1 %p\n", this->home);
+      
       Json::Value *jv_ptr = (this->home)->dump2JSON();
+      
+      // debug line -- Json::Value *jv_ptr = (this->home)->GPS_DD::dump2JSON();
+      // printf("Person dump2JSON home 2 %p\n", jv_ptr);
+      // std::cout << (*jv_ptr) << std::endl;
+      
       if (jv_ptr != NULL)
 	{
 	  (*result_ptr)["home"] = *jv_ptr;
+	  delete jv_ptr;
 	}
-      delete jv_ptr;
     }
 
   return result_ptr;
@@ -110,13 +140,15 @@ Person::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-
   ecs36b_Exception lv_exception {};
   ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
   JSON2Object_precheck(arg_json_ptr, lv_exception_ptr,
 		       ECS36B_ERROR_JSON2OBJECT_PERSON);
-    
+
+  // printf("Person Here 1\n");
+  // std::cout << (*arg_json_ptr) << std::endl;
+  
   if (((*arg_json_ptr)["vsID"].isNull() == true) ||
       ((*arg_json_ptr)["vsID"].isString() == false))
     {
@@ -198,20 +230,32 @@ Person::JSON2Object
 	    {
 	      this->home = new GPS_DD();
 	    }
+	  // printf("Person Here 2\n");
+	  // std::cout << (*arg_json_ptr)["home"] << std::endl;
 	  (this->home)->JSON2Object(&((*arg_json_ptr)["home"]));
 	}
-      catch(ecs36b_Exception e)
+      catch(ecs36b_Exception& e)
 	{
-	  printf("Person Home exp\n");
+	  // printf("Person Home exp\n");
 	  JSON2Object_appendEI(e, lv_exception_ptr, 0);
 	}
+      // Json::Value * jvtmp_ptr = (this->home)->dump2JSON();
+      // printf("Person Home dump2JSON %p %p\n", this->home, jvtmp_ptr);
+      // if (jvtmp_ptr != NULL)
+      // {
+      //  std::cout << (*jvtmp_ptr) << std::endl;
+      //  delete jvtmp_ptr;
+      // }
     }
 
+  // printf("Person Here 3\n");
   if ((lv_exception_ptr->info_vector).size() != 0)
     {
+      // printf("Person Here 3.1\n");
       throw (*lv_exception_ptr);
     }
 
+  // printf("Person Here 4\n");
   return;
 }
 

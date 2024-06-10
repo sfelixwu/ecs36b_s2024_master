@@ -6,7 +6,7 @@ Reaction::Reaction
 {
   this->class_name = "Reaction";
 
-  this->type = "";
+  this->type = "default";
   this->author = (Person *) NULL;
   this->created = (JvTime *) NULL;
 }
@@ -14,6 +14,8 @@ Reaction::Reaction
 Reaction::~Reaction
 (void)
 {
+  // return;
+  
   if (this->author != NULL) delete this->author;
   if (this->created != NULL) delete this->created;
 }
@@ -26,25 +28,24 @@ Reaction::Reaction
   this->created = arg_created;
 }
 
-
 bool
 Reaction::operator==
-(Reaction aReaction)
+(Reaction& aReaction)
 {
   bool brc = true;
 
-  printf("Reaction OL 1\n");
+  // printf("Reaction OL 1\n");
   if (((this->author) != NULL) && ((aReaction.author) != NULL))
     {
       brc = ((*(this->author)) == (*(aReaction.author)));
     }
 
-  printf("Reaction OL 2\n");
+  // printf("Reaction OL 2\n");
   if (((this->created) != NULL) && ((aReaction.created) != NULL))
     {
       brc = (brc && ((*(this->created)) == (*(aReaction.created))));
     }
-  printf("Reaction OL 3\n");
+  // printf("Reaction OL 3\n");
 
   return (brc && (this->type   == aReaction.type));
 }
@@ -54,16 +55,28 @@ Reaction::dump2JSON
 (void)
 {
   Json::Value * result_ptr = new Json::Value();
+  Json::Value * jv_ptr = NULL;
+  
   if (this->author != NULL)
     {
-      (*result_ptr)["from"] = *((this->author)->dump2JSON());
+      jv_ptr = (this->author)->dump2JSON();
+      if (jv_ptr != NULL)
+	{
+	  (*result_ptr)["from"] = (*jv_ptr);
+	  delete jv_ptr;
+	}
     }
 
   (*result_ptr)["type"] = this->type;
 
   if (this->created != NULL)
     {
-      (*result_ptr)["created"] = *((this->created)->dump2JSON());
+      jv_ptr = (this->created)->dump2JSON();
+      if (jv_ptr != NULL)
+	{
+	  (*result_ptr)["created"] = (*jv_ptr);
+	  delete jv_ptr;
+	}
     }
 
   return result_ptr;
@@ -138,7 +151,7 @@ Reaction::JSON2Object
 	    }
 	  (this->created)->JSON2Object(&((*arg_json_ptr)["created"]));
 	}
-      catch(ecs36b_Exception e)
+      catch(ecs36b_Exception& e)
 	{
 	  JSON2Object_appendEI(e, lv_exception_ptr, 0);
 	}
@@ -175,7 +188,7 @@ Reaction::JSON2Object
 	    }
 	  (this->author)->JSON2Object(&((*arg_json_ptr)["from"]));
 	}
-      catch(ecs36b_Exception e)
+      catch(ecs36b_Exception& e)
 	{
 	  JSON2Object_appendEI(e, lv_exception_ptr, 0);
 	}

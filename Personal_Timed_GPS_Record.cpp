@@ -58,12 +58,19 @@ Personal_Timed_GPS_Record::dump2JSON
 (void)
 {
   Json::Value * result_ptr = new Json::Value();
+  Json::Value * jv_ptr     = NULL;
+  
   (*result_ptr)["identity"] = this->identity;
 
   int i;
   for (i = 0; i < (this->traces).size(); i++)
     {
-      (*result_ptr)["traces"][i] = *(((this->traces)[i]).dump2JSON());
+      jv_ptr = ((this->traces)[i]).dump2JSON();
+      if (jv_ptr != NULL)
+	{
+	  (*result_ptr)["traces"][i] = (*jv_ptr);
+	  delete jv_ptr;
+	}
     }
   return result_ptr;
 }
@@ -73,7 +80,6 @@ Personal_Timed_GPS_Record::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-
   ecs36b_Exception lv_exception {};
   ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
@@ -107,7 +113,7 @@ Personal_Timed_GPS_Record::JSON2Object
 	{
 	  this->identity = ((*arg_json_ptr)["identity"]).asString();
 	}
-      catch(ecs36b_Exception e)
+      catch(ecs36b_Exception& e)
 	{
 	  JSON2Object_appendEI(e, lv_exception_ptr, 0);
 	}
@@ -145,7 +151,7 @@ Personal_Timed_GPS_Record::JSON2Object
 	      this->traces.push_back(*(lvTL_ptr));
 	      delete lvTL_ptr;
 	    }
-	  catch(ecs36b_Exception e)
+	  catch(ecs36b_Exception& e)
 	    {
 	      JSON2Object_appendEI(e, lv_exception_ptr, ai);
 	    }

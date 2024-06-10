@@ -47,7 +47,7 @@ class Post : public Core
   ~Post();
   Post(Person * arg_author, Message * arg_msg);
   
-  bool operator==(Post aPost);
+  bool operator==(Post& aPost);
 
   virtual Json::Value * dump2JSON(void);
   virtual void JSON2Object(Json::Value *);

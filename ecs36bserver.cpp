@@ -34,8 +34,10 @@ Myecs36bServer::update(const std::string& updating_json)
   Json::Value result_json;
   char fname_buf[BUFSIZE];
   FILE * post_f_ptr;
+  
   int rc = ECS36B_ERROR_NORMAL;
   bool brc = false;
+  
   Post * post_ptr = NULL;
   unsigned int exception_count = 0;
   
@@ -45,7 +47,8 @@ Myecs36bServer::update(const std::string& updating_json)
 #endif /* _ECS36B_DEBUG_ */
 
   Exception_Info * ei_ptr = NULL;
-  ecs36b_Exception * lv_exception_ptr = new ecs36b_Exception {};
+  ecs36b_Exception lv_exception {};
+  ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
   try
     {
@@ -107,7 +110,7 @@ Myecs36bServer::update(const std::string& updating_json)
 	       strlen(((myv_message["id"]).asString()).c_str()) + 1,
 	       "./posts/post_%s.json", ((myv_message["id"]).asString()).c_str());
   
-      std::cout << "name: " << fname_buf << std::endl;
+      // std::cout << "name: " << fname_buf << std::endl;
       
       // check vsID portion of id
       {
@@ -129,52 +132,41 @@ Myecs36bServer::update(const std::string& updating_json)
       Json::Value pjf_v;
       rc = myFile2JSON(fname_buf, &pjf_v);
 
-      if (rc != ECS36B_ERROR_NORMAL)
+      if ((rc != ECS36B_ERROR_NORMAL) &&
+	  (rc != ECS36B_ERROR_FILE_NOT_EXIST))
 	{
-#ifdef XYZ
 	  ei_ptr = new Exception_Info {};
 	  ei_ptr->where_code = ECS36B_ERROR_JSONRPC_SERVER;
 	  ei_ptr->which_string = "update File2JSON from file";
 	  ei_ptr->how_code = ECS36B_ERROR_NORMAL;
 	  ei_ptr->what_code = rc;
 	  (lv_exception_ptr->info_vector).push_back(ei_ptr);
-#endif /* XYZ */
+	  throw (*lv_exception_ptr);
 	}
       else
 	{
 	  try
 	    {
 	      // parsing the existing JSON Object copy, under ./posts/post...
-	      // printf("before Post::JSON2Object 01\n");
-	      // fflush(stdout);
 	      post_ptr->JSON2Object(&pjf_v);
-	      // printf("after  Post::JSON2Object 01\n");
-	      // fflush(stdout);
 	    }
-	  catch(ecs36b_Exception e)
+	  catch(ecs36b_Exception& e)
 	    {
-	      // printf("after  Post::JSON2Object 02\n");
-	      // printf("so the saved copy trigger exceptions?");
-	      // fflush(stdout);
-	      
 	      JSON2Object_appendEI(e, lv_exception_ptr, 0);
-	      // printf("after  Post::JSON2Object 03\n");
-	      // fflush(stdout);
 	    }
 	}
 
-      std::cout << (&myv_message) << std::endl;
-            
+      // std::cout << (&myv_message) << std::endl;      
       try
 	{
 	  // now the new object, perhaps merged
-	  // printf("before Post::JSON2Object 04\n");
+	  // printf("ecs36bserver before Post::JSON2Object 04\n");
 	  // fflush(stdout);
 	  post_ptr->JSON2Object(&myv_message);
-	  // printf("after  Post::JSON2Object 05\n");
+	  // printf("ecs36bserver after  Post::JSON2Object 05\n");
 	  // fflush(stdout);
 	}
-      catch(ecs36b_Exception e)
+      catch(ecs36b_Exception& e)
 	{
 	  // printf("after  Post::JSON2Object 06\n");
 	  // fflush(stdout);
@@ -265,13 +257,13 @@ Myecs36bServer::update(const std::string& updating_json)
       if ((lv_exception_ptr->info_vector).size() != 0)
 	{
 	  exception_count = (lv_exception_ptr->info_vector).size();
-	  std::cout << exception_count << std::endl;
-	  std::cout << *(lv_exception_ptr->dump2JSON()) << std::endl;
+	  // std::cout << exception_count << std::endl;
+	  // std::cout << *(lv_exception_ptr->dump2JSON()) << std::endl;
 	  throw (*lv_exception_ptr);
 	}
       // printf("Here 2.85\n");
     }
-  catch (ecs36b_Exception e)
+  catch (ecs36b_Exception& e)
     {
       // printf("Here 2.9\n");
       int erc = produceErrorJSON(e, "ecs36bserver_update.log", &result_json, 0);
@@ -287,22 +279,25 @@ Myecs36bServer::update(const std::string& updating_json)
       myPrintLog("{\"location\":\"before write back POST_PTR null\"}", "ecs36bserver_update.log");
       return result_json;
     }
-  
-  // printf("Here 2.11 [%p]\n", post_ptr);
+
+  // printf("Here 2.110 [%p]\n", post_ptr);
   Json::Value *rj_ptr = post_ptr->dump2JSON();
-  std::cout << exception_count << std::endl;
+  // printf("Here 2.115 [%p]\n", post_ptr);
+  // std::cout << exception_count << std::endl;
   (*rj_ptr)["exception count"] = exception_count;
-  
-  std::cout << (*rj_ptr) << std::endl;
-  delete post_ptr;
-  
+  // printf("Here 2.116 [%p]\n", post_ptr);
+
   // printf("Here 2.12\n");
-
+  result_json = (*rj_ptr);
+  std::cout << result_json << std::endl;
+  (*rj_ptr)["JSON2Object"] = post_ptr->J2O_input;
   rc = myJSON2File(fname_buf, rj_ptr);
-
+  delete rj_ptr;
+  // strange *** resolved
+  delete post_ptr;
   // printf("Here 2.13\n");
 
-  return (*rj_ptr);
+  return result_json;
 }
 
 int
@@ -328,8 +323,9 @@ Myecs36bServer::search
   int rc = ECS36B_ERROR_NORMAL;
   bool brc = false;
 
-#ifdef _ECS36B_DEBUG_
   std::cout << "search" << " " << search_clause << std::endl;
+
+#ifdef _ECS36B_DEBUG_
 #endif /* _ECS36B_DEBUG_ */
 
   Exception_Info * ei_ptr = NULL;

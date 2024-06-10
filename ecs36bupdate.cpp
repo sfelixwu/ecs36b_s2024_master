@@ -125,16 +125,10 @@ main
     {
       post_ptr->JSON2Object(&jv);
     }
-  catch(ecs36b_Exception e)
+  catch(ecs36b_Exception& e)
     {
-      int i;
-      for (i = 0; i < (e.info_vector).size(); i++)
-	{
-	  Exception_Info * ei_ptr_copy = new Exception_Info {};
-	  (*ei_ptr_copy) = (*((e.info_vector)[i]));
-	  (lv_exception_ptr->info_vector).push_back(ei_ptr_copy);
-	}
-      e.myDestructor();
+      // std::cout << "post JSON2Object exception\n";
+      JSON2Object_appendEI(e, lv_exception_ptr, 0);
     }
 
   if ((lv_exception_ptr->info_vector).size() != 0)
@@ -144,6 +138,19 @@ main
       lv_exception_ptr->myDestructor();
     }
 
+  // Json::Value *jv2 = post_ptr->dump2JSON();
+  // if (jv2 != NULL)
+  // {
+      // std::cout << *jv2 << std::endl;
+  // }
+  // else
+  // {
+      // printf("jv2 NULL\n");
+  // }
+  //  delete post_ptr;
+  //  std::cout << jv << std::endl;
+  //  return 0;
+  
   HttpClient httpclient("https://ethikos.ngrok.io");
   // HttpClient httpclient("http://localhost:8384");
   // HttpClient httpclient("http://169.237.6.102:55407");

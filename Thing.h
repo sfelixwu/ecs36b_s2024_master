@@ -20,7 +20,7 @@ class Thing : public Core
   unsigned int sequence_num;
 
   Thing(void);
-  bool operator==(Thing);
+  bool operator==(Thing&);
 
   virtual Json::Value * dump2JSON(void);
   virtual void JSON2Object(Json::Value *);

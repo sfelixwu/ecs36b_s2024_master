@@ -14,6 +14,8 @@ Tag::Tag
 Tag::~Tag
 ()
 {
+  // return;
+  
   if (this->tagged != NULL) delete this->tagged;
 }
 
@@ -35,11 +37,18 @@ Tag::dump2JSON
     }
 
   Json::Value *result_ptr = new Json::Value();
+  Json::Value *jv_ptr = NULL;
+  
   (*result_ptr)["index"] = this->index;
 
   if (this->tagged != NULL)
     {
-      (*result_ptr)["tagged"]  = (*((this->tagged)->dump2JSON()));
+      jv_ptr = (this->tagged)->dump2JSON();
+      if (jv_ptr != NULL)
+	{
+	  (*result_ptr)["tagged"]  = (*jv_ptr);
+	  delete jv_ptr;
+	}
     }
 
   // The following bug, fixed, was discovered by ecs36b f2020 students!! Thanks.
@@ -56,7 +65,6 @@ Tag::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  
   ecs36b_Exception lv_exception {};
   ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
@@ -147,7 +155,7 @@ Tag::JSON2Object
 
 	  (this->tagged)->JSON2Object(&((*arg_json_ptr)["tagged"]));
 	}
-      catch(ecs36b_Exception e)
+      catch(ecs36b_Exception& e)
 	{
 	  JSON2Object_appendEI(e, lv_exception_ptr, 0);
 	}

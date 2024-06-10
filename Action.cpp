@@ -4,10 +4,10 @@
 Action::Action(void)
 {
   this->class_name = "Action";
-  this->name = "";
+  this->name = "default";
 
   // do we need this?
-  std::cout << "Action constructor called\n";
+  // std::cout << "Action constructor called\n";
   this->host_url = "";
   this->object_id = "";
   this->owner_vsID = "";
@@ -24,7 +24,7 @@ Action::Action(std::string core_arg_host_url,
 
 bool
 Action::operator==
-(Action aAction)
+(Action& aAction)
 {
   return ((this->name) == aAction.name);
 }
@@ -35,8 +35,18 @@ Action::dump2JSON
 {
   Json::Value * result_ptr = this->Core::dump2JSON();
 
-  printf("Action dump2JSON from Core --\n");
-  std::cout << (*result_ptr) << std::endl;
+  if (result_ptr != NULL)
+    {
+      // printf("Action dump2JSON from Core --\n");
+      // std::cout << (*result_ptr) << std::endl;
+    }
+  else
+    {
+      if (this->name != "")
+	{
+	  result_ptr = new Json::Value ();
+	}
+    }
   
   if (this->name != "")
     {
@@ -55,7 +65,6 @@ Action::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  
   ecs36b_Exception lv_exception {};
   ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
@@ -66,7 +75,7 @@ Action::JSON2Object
     {
       this->Core::JSON2Object(arg_json_ptr);
     }
-  catch(ecs36b_Exception e)
+  catch(ecs36b_Exception& e)
     {
       JSON2Object_appendEI(e, lv_exception_ptr, 0);
     }

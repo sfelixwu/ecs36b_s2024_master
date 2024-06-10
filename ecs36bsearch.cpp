@@ -23,7 +23,8 @@ main(int argc, char *argv[])
   Json::Value jv;
   int rc = myFile2JSON(argv[1], &jv);
 
-  HttpClient httpclient("http://localhost:8384");
+  HttpClient httpclient("https://ethikos.ngrok.io");
+  // HttpClient httpclient("http://localhost:8384");
   // HttpClient httpclient("http://169.237.6.102:55407");
   ecs36bClient myClient(httpclient, JSONRPC_CLIENT_V2);
 

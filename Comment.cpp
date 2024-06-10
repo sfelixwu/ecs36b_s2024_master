@@ -14,7 +14,7 @@ Comment::Comment
   this->reactions  = (std::vector<Reaction *> *) NULL;
   this->tags       = (std::vector<Tag *> *)      NULL;
 
-  std::cout << "Comment constructor called\n";
+  // std::cout << "Comment constructor called\n";
 }
 
 Comment::Comment
@@ -40,6 +40,8 @@ Comment::Comment
 Comment::~Comment
 (void)
 {
+  // return;
+  
   if (this->author  != NULL) delete this->author;
   if (this->msg     != NULL) delete this->msg;
   if (this->created != NULL) delete this->created;
@@ -74,7 +76,7 @@ Comment::~Comment
 
 bool
 Comment::operator==
-(Comment aComment)
+(Comment& aComment)
 {
   // operator== of Identifier
   return (this->id == aComment.id);
@@ -100,19 +102,28 @@ Comment::dump2JSON
   Json::Value * result_ptr = new Json::Value();
 
   (*result_ptr)["id"]           = (this->id).get();
-
+  
   dumpjv_ptr                    = (this->author)->dump2JSON();
-  (*result_ptr)["from"]         = (*dumpjv_ptr);
-  delete dumpjv_ptr;
+  if (dumpjv_ptr != NULL)
+    {
+      (*result_ptr)["from"]         = (*dumpjv_ptr);
+      delete dumpjv_ptr;
+    }
   
   dumpjv_ptr                    = (this->msg)->dump2JSON();
-  (*result_ptr)["message"]      = (*dumpjv_ptr);
-  delete dumpjv_ptr;
-
+  if (dumpjv_ptr != NULL)
+    {
+      (*result_ptr)["message"]      = (*dumpjv_ptr);
+      delete dumpjv_ptr;
+    }
+  
   dumpjv_ptr                    = (this->created)->dump2JSON();
-  (*result_ptr)["created"]      = (*dumpjv_ptr);
-  delete dumpjv_ptr;
-
+  if (dumpjv_ptr != NULL)
+    {
+      (*result_ptr)["created"]      = (*dumpjv_ptr);
+      delete dumpjv_ptr;
+    }
+  
   // adding the reaction part
   Json::Value json_c_reactions;
   Json::Value json_c_reactions_array;
@@ -123,8 +134,11 @@ Comment::dump2JSON
       for (i = 0; i < (this->reactions)->size(); i++)
 	{
 	  dumpjv_ptr = ((*(this->reactions))[i])->dump2JSON();
-	  json_c_reactions[i] = (*dumpjv_ptr);
-	  delete dumpjv_ptr;
+	  if (dumpjv_ptr != NULL)
+	    {
+	      json_c_reactions[i] = (*dumpjv_ptr);
+	      delete dumpjv_ptr;
+	    }
 	}
       json_c_reactions_array["data"] = json_c_reactions;
       json_c_reactions_array["count"] = ((int) (*(this->reactions)).size());
@@ -141,8 +155,11 @@ Comment::dump2JSON
       for (i = 0; i < (this->tags)->size(); i++)
 	{
 	  dumpjv_ptr = ((*(this->tags))[i])->dump2JSON();
-	  json_c_tags[i] = (*dumpjv_ptr);
-	  delete dumpjv_ptr;
+	  if (dumpjv_ptr != NULL)
+	    {
+	      json_c_tags[i] = (*dumpjv_ptr);
+	      delete dumpjv_ptr;
+	    }
 	}
       json_c_tags_array["data"] = json_c_tags;
       json_c_tags_array["count"] = ((int) (*(this->tags)).size());
@@ -157,7 +174,6 @@ Comment::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  
   ecs36b_Exception lv_exception {};
   ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
@@ -165,7 +181,6 @@ Comment::JSON2Object
 		       ECS36B_ERROR_JSON2OBJECT_COMMENT);
 
   // printf("Comment Here 1\n");
-
   // "id"
   if (((*arg_json_ptr)["id"].isNull() == true) ||
       ((*arg_json_ptr)["id"].isString() == false))
@@ -204,7 +219,6 @@ Comment::JSON2Object
     }
 
   // printf("Comment Here 2\n");
-  
   // "from"
   if (((*arg_json_ptr)["from"].isNull() == true) ||
       ((*arg_json_ptr)["from"].isObject() == false))
@@ -231,20 +245,26 @@ Comment::JSON2Object
     {
       try
 	{
+	  // printf("Comment Here 2.1\n");
 	  if (this->author == NULL)
 	    {
+	      // printf("Comment Here 2.2\n");
 	      this->author = new Person();
+	      // printf("Comment Here 2.3\n");
 	    }
+	  // printf("Comment Here 2.4\n");
 	  (this->author)->JSON2Object(&((*arg_json_ptr)["from"]));
+	  // printf("Comment Here 2.5\n");
 	}
-      catch(ecs36b_Exception e)
+      catch(ecs36b_Exception& e)
 	{
+	  // printf("Comment Here 2.6\n");
 	  JSON2Object_appendEI(e, lv_exception_ptr, 0);
+	  // printf("Comment Here 2.7\n");
 	}
     }
 
   // printf("Comment Here 3\n");
-
   // "message"
   if (((*arg_json_ptr)["message"].isNull() == true) ||
       ((*arg_json_ptr)["message"].isObject() == false))
@@ -277,14 +297,13 @@ Comment::JSON2Object
 	    }
 	  (this->msg)->JSON2Object(&((*arg_json_ptr)["message"]));
 	}
-      catch(ecs36b_Exception e)
+      catch(ecs36b_Exception& e)
 	{
 	  JSON2Object_appendEI(e, lv_exception_ptr, 0);
 	}
     }
 
   // printf("Comment Here 4\n");
-
   // "created"
   if (((*arg_json_ptr)["created"].isNull() == true) ||
       ((*arg_json_ptr)["created"].isObject() == false))
@@ -317,14 +336,13 @@ Comment::JSON2Object
 	    }
 	  (this->created)->JSON2Object(&((*arg_json_ptr)["created"]));
 	}
-      catch(ecs36b_Exception e)
+      catch(ecs36b_Exception& e)
 	{
 	  JSON2Object_appendEI(e, lv_exception_ptr, 0);
 	}
     }
 
   // printf("Comment Here 5\n");
-
   // now handling the reaction and tag parts
   // (1) "reactions"
   if ((((*arg_json_ptr)["reactions"]).isNull() == true) ||
@@ -391,8 +409,9 @@ Comment::JSON2Object
 		  l_reaction_ptr->JSON2Object(&(l_jv_reaction));
 		  // printf("Comment Here 5 4\n");
 		}
-	      catch(ecs36b_Exception e)
+	      catch(ecs36b_Exception& e)
 		{
+		  // printf("Comment Here 5 4 1\n");
 		  JSON2Object_appendEI(e, lv_exception_ptr, ai);
 		}
 
@@ -425,8 +444,8 @@ Comment::JSON2Object
 	    }
 	}
     }
+  
   // printf("Comment Here 6\n");
-
   // (2) tags
   if ((((*arg_json_ptr)["tags"]).isNull() == true) ||
       (((*arg_json_ptr)["tags"]).isObject() != true))
@@ -488,7 +507,7 @@ Comment::JSON2Object
 		{
 		  l_tag_ptr->JSON2Object(&(l_jv_tag));
 		}
-	      catch(ecs36b_Exception e)
+	      catch(ecs36b_Exception& e)
 		{
 		  JSON2Object_appendEI(e, lv_exception_ptr, ai);
 		}
@@ -532,11 +551,11 @@ Comment::JSON2Object
     }
 
   // printf("Comment Here 7\n");
-
   if ((lv_exception_ptr->info_vector).size() != 0)
     {
       throw (*lv_exception_ptr);
     }
 
+  // printf("Comment Here 8\n");
   return;
 }

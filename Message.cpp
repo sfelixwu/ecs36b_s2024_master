@@ -5,14 +5,12 @@ Message::Message
 (void)
 {
   this->class_name = "Message";
-
   this->content = "";
 }
 
 Message::Message(std::string arg_s)
 {
   this->class_name = "Message";
-
   this->content = arg_s;
 }
 
@@ -51,7 +49,6 @@ Message::JSON2Object
 (Json::Value *arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  
   ecs36b_Exception lv_exception {};
   ecs36b_Exception * lv_exception_ptr = &lv_exception;
 

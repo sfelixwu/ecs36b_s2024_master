@@ -29,7 +29,7 @@ public:
   void setWhere(GPS_DD *);
   void setWhen(JvTime *);
 
-  bool operator==(Record aRecord);
+  bool operator==(Record& aRecord);
   
   virtual Json::Value * dump2JSON(void);
   virtual void JSON2Object(Json::Value *);

@@ -21,8 +21,9 @@ class GPS_DD : public Core
   const double getLatitude();
   const double getLongitude();
   double distance(GPS_DD);
-  bool operator==(GPS_DD another);
-  bool operator<(GPS_DD another);
+
+  bool operator==(GPS_DD& another);
+  bool operator< (GPS_DD& another);
   
   virtual Json::Value * dump2JSON(void);
   virtual void JSON2Object(Json::Value *);

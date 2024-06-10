@@ -19,7 +19,7 @@ class Holdable : public Locatable
   
   Holdable(void);
   ~Holdable(void);
-  bool operator==(Holdable);
+  bool operator==(Holdable&);
   virtual Json::Value * dump2JSON(void);
   virtual void JSON2Object(Json::Value * arg_json_ptr);
 };

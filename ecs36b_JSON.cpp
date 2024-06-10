@@ -64,11 +64,11 @@ JSON2Object_appendEI
   for (ei = 0; ei < (arg_e.info_vector).size(); ei++)
     {
       Exception_Info * ei_ptr_copy = new Exception_Info {};
-      (*ei_ptr_copy) = (*((arg_e.info_vector)[ei]));
+      ((Exception_Info&) (*ei_ptr_copy)) = ((Exception_Info&) (*((arg_e.info_vector)[ei])));
       ei_ptr_copy->array_index = arg_index;
       (arg_exception_ptr->info_vector).push_back(ei_ptr_copy);
     }
-  // arg_e.myDestructor();
+  arg_e.myDestructor();
   return;
 }
 
@@ -97,7 +97,7 @@ int
 myParseJSON
 (std::string input, Json::Value * jv_ptr)
 {
-  if (jv_ptr == NULL) return -1;
+  if (jv_ptr == NULL) return ECS36B_ERROR_NULL_JSON_PTR;
 
   Json::CharReaderBuilder builder;
   Json::CharReader* reader;
@@ -113,9 +113,10 @@ myParseJSON
   if (!parsingSuccessful) {
     std::cout << "Failed to parse the content of the first JSON, errors:" << std::endl;
     std::cout << errors << std::endl;
-    return -2;
+    return ECS36B_ERROR_JSON_PARSING;
   }
-  return 0;
+  
+  return ECS36B_ERROR_NORMAL;
 }
 
 char *
@@ -156,11 +157,14 @@ myFile2JSON
   int rc;
 
   char *json_str = myFile2String(f_name);
-  std::cout << f_name << std::endl;
-  std::cout << ((void *) json_str) << std::endl;
-  std::cout << jv_ptr << std::endl;
+  std::cout << f_name             << std::endl;
+  std::cout << ((void*) json_str) << std::endl;
+  std::cout << (jv_ptr)           << std::endl;
 
-  if (json_str == NULL) rc = -1;
+  if (json_str == NULL)
+    {
+      rc = ECS36B_ERROR_FILE_NOT_EXIST;
+    }
   else
     {
       rc = myParseJSON(json_str, jv_ptr);
@@ -180,7 +184,7 @@ myJSON2File
   if (f_ptr == NULL)
     {
       std::cout << f_name << " fopen for write failed myJSON2File" << std::endl;
-      return -3;
+      return ECS36B_ERROR_FILE_NOT_EXIST;
     }
 
   std::string json_str = (*jv_ptr).toStyledString();
@@ -201,10 +205,10 @@ myJSON2File
   if (lresult != lSize)
     {
       fputs("Writing error", stderr);
-      return -4;
+      return ECS36B_ERROR_FILE_WRITE;
     }
 
-  return 0;
+  return ECS36B_ERROR_NORMAL;
 }
 
 const char *ecs36berror[] =
@@ -282,13 +286,17 @@ int
 produceErrorJSON
 (ecs36b_Exception e, const char log_file_name[], Json::Value *jv_ptr, int extra)
 {
+  printf("Producing errors\n");
   if (((e.info_vector).size() <= 0) ||
       (jv_ptr == NULL) ||
       (log_file_name == NULL))
     return ECS36B_ERROR_NULL_JSON_PTR;
 
+  printf("Producing errors Check 2\n");
+
   jv_ptr = e.dump2JSON();
   myPrintLog((*jv_ptr).toStyledString(), log_file_name);
+  printf("Produced errors\n");
   return ECS36B_ERROR_NORMAL;
 }
 
@@ -646,7 +654,7 @@ Identifier::setPPC
 
 bool
 Identifier::operator==
-(Identifier aIdentifier)
+(Identifier& aIdentifier)
 {
   if ((this->comment == "") && (aIdentifier.comment == ""))
     {

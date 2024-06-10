@@ -15,7 +15,7 @@ class Link : public Core
   Link();
   Link(std::string arg_url);
 
-  bool operator==(Link aLink);
+  bool operator==(Link& aLink);
 
   virtual Json::Value * dump2JSON(void);
   virtual void JSON2Object(Json::Value *);

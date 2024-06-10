@@ -4,6 +4,7 @@ Team::Team
 (void)
 {
   this->class_name = "Team";
+  this->name = "default";
   this->members = NULL;
 }
 
@@ -32,7 +33,8 @@ Team::dump2JSON
 (void)
 {
   Json::Value * result_ptr = new Json::Value();
-
+  Json::Value * jv_ptr = NULL;
+  
   (*result_ptr)["class name"] = this->class_name;
   (*result_ptr)["name"] = this->name;
 
@@ -45,7 +47,12 @@ Team::dump2JSON
   int i = 0;
   for (i = 0; i < (this->members)->size(); i++)
     {
-      an_jv_array[i] = ((*(this->members))[i])->dump2JSON();
+      jv_ptr = ((*(this->members))[i])->dump2JSON();
+      if (jv_ptr != NULL)
+	{
+	  an_jv_array[i] = (*jv_ptr);
+	  delete jv_ptr;
+	}
     }
   (*result_ptr)["members"]["data"] = an_jv_array;
   (*result_ptr)["members"]["count"] = ((unsigned int) (this->members)->size());

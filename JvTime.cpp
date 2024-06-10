@@ -135,7 +135,7 @@ JvTime::getTimeString
 
 bool
 JvTime::operator==
-(JvTime arg_jvt)
+(JvTime& arg_jvt)
 {
   return ((this->year == arg_jvt.year) && 
 	  (this->month == arg_jvt.month) && 
@@ -147,7 +147,7 @@ JvTime::operator==
 
 bool
 JvTime::operator<
-(JvTime arg_jvt)
+(JvTime& arg_jvt)
 {
   if (this->year <= arg_jvt.year)
     {
@@ -216,7 +216,7 @@ JvTime::operator<
 
 double
 JvTime::operator-
-(JvTime arg_jvt)
+(JvTime& arg_jvt)
 {
   // arg_jvt should be older timestamp
   
@@ -247,7 +247,6 @@ JvTime::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  
   ecs36b_Exception lv_exception {};
   ecs36b_Exception * lv_exception_ptr = &lv_exception;
 

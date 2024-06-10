@@ -10,8 +10,10 @@ Json::Value *
 Commutable::dump2JSON
 (void)
 {
+  return NULL;
+  
   Json::Value * result_ptr = new Json::Value();
-  (*result_ptr)["class name"] = "Commutable";
+  (*result_ptr)["class name"] = this->class_name;
   return result_ptr;
 }
 
@@ -20,7 +22,6 @@ Commutable::JSON2Object
 (Json::Value * arg_json_ptr)
 {
   Exception_Info * ei_ptr = NULL;
-  
   ecs36b_Exception lv_exception {};
   ecs36b_Exception * lv_exception_ptr = &lv_exception;
 
